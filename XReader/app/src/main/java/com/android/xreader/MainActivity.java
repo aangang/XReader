@@ -219,6 +219,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 } else {
                     setMainMenuVisibility(true);
                 }
+                toNextPage();
             }
         });
 
@@ -231,6 +232,42 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     protected void onResume() {
         super.onResume();
     }
+
+    public void toPrePage() {
+        // TODO Auto-generated method stub
+        try {
+            pagefactory.prePage();
+            begin = pagefactory.getM_mbBufBegin();// 获取当前阅读位置
+            word = pagefactory.getFirstLineText();// 获取当前阅读位置的首行文字
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        if (pagefactory.isfirstPage()) {
+            Toast.makeText(mContext, "当前是第一页", Toast.LENGTH_SHORT).show();
+        }
+        pagefactory.onDraw(mNextPageCanvas);
+        //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
+        editor.putInt(filepath + "begin", begin).commit();
+    }
+
+
+    public void toNextPage() {
+        // TODO Auto-generated method stub
+        try {
+            pagefactory.nextPage();
+            begin = pagefactory.getM_mbBufBegin();// 获取当前阅读位置
+            word = pagefactory.getFirstLineText();// 获取当前阅读位置的首行文字
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        if (pagefactory.islastPage()) {
+            Toast.makeText(mContext, "已经是最后一页了", Toast.LENGTH_SHORT).show();
+        }
+        pagefactory.onDraw(mNextPageCanvas);
+        //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
+        editor.putInt(filepath + "begin", begin).commit();
+    }
+
     /**
      * 初始化所有POPUPWINDOW
      */
