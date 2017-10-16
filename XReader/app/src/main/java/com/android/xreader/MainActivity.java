@@ -54,7 +54,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
     Canvas mCurPageCanvas, mNextPageCanvas;
 
-    //BookPageFactory pagefactory;
+    BookPageFactory pagefactory;
 
     private String filepath;
 
@@ -144,7 +144,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         topBar = findViewById(R.id.top_bar);
         //rlayout.addView(mPageWidget);
         // 工厂
-        //pagefactory = new BookPageFactory(this, width, height);
+        pagefactory = new BookPageFactory(this, width, height);
 
         BookFile bookFile = (BookFile) getIntent().getExtras().getSerializable("path");
         filepath = bookFile.name;
@@ -154,18 +154,19 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         // 阅读背景
         setReadBg();
 
-        /*try {
+        try {
             if (bookFile.flag.equals("1")) {
                 pagefactory.openbook(bookFile.path, begin);
             } else {
                 pagefactory.openbook(filecatchpath + "catch.txt", begin);
             }
+            log("book opened :" + bookFile.name);
             pagefactory.setM_fontSize(size);
             pagefactory.onDraw(mCurPageCanvas);
         } catch (IOException e1) {
             e1.printStackTrace();
             Toast.makeText(this, "no find file", Toast.LENGTH_SHORT).show();
-        }*/
+        }
 
         /*mPageWidget.setBitmaps(mCurPageBitmap, mCurPageBitmap);
 
@@ -190,7 +191,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             }
         });*/
 
-        //mCurrentFontSize = pagefactory.getM_fontSize();
+        mCurrentFontSize = pagefactory.getM_fontSize();
 
         setPop();
 
@@ -418,11 +419,11 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     }
 
     private void setReadBg() {
-        /*pagefactory.setTextColor(isNight);
+        pagefactory.setTextColor(isNight);
         if (isNight) {
             pagefactory.setBgBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.bg_book_night));
         } else {
             pagefactory.setBgBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.bg_book_day));
-        }*/
+        }
     }
 }
