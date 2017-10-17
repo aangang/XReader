@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 
 import com.android.xreader.module.BookFile;
+import com.android.xreader.module.BookMark;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class DBManager {
 		}
 	}
 
-/*	public void addMarks(BookMark mark) {
+	public void addMarks(BookMark mark) {
 		db.beginTransaction();
 		try {
 			db.execSQL("INSERT INTO marks VALUES(null, ?, ?, ?)", new Object[] {
@@ -48,7 +49,7 @@ public class DBManager {
 
 			db.endTransaction();
 		}
-	}*/
+	}
 
 	/**
 	 * update book
@@ -107,7 +108,7 @@ public class DBManager {
 		return books;
 	}
 
-/*	public ArrayList<BookMark> queryMarks(String name) {
+	public ArrayList<BookMark> queryMarks(String name) {
 		// List<Profession> professions = new ArrayList<Profession>();
 		ArrayList<BookMark> books = new ArrayList<BookMark>();
 		Cursor c = queryTheCursor("marks", name);
@@ -120,7 +121,7 @@ public class DBManager {
 		}
 		c.close();
 		return books;
-	}*/
+	}
 
 	/**
 	 * 

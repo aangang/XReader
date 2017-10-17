@@ -33,10 +33,13 @@ import android.widget.Toast;
 
 import com.android.xreader.db.DBManager;
 import com.android.xreader.module.BookFile;
+import com.android.xreader.module.BookMark;
 import com.android.xreader.utils.FusionField;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends Activity implements OnSeekBarChangeListener, OnClickListener {
@@ -100,7 +103,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
     private DBManager mgr;
 
-    //private List<BookMark> bookmarks;
+    private List<BookMark> bookmarks;
 
     private static final int FONT_STEP = 2;
 
@@ -444,6 +447,20 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             case R.id.ib_back_top:
                 finish();
                 break;
+            case R.id.ib_add_mark_top:
+                BookMark mark = new BookMark();
+                mark.name = filepath;
+                mark.begin = begin;
+                mark.time = getStringCurrentDate();
+                if (word.trim().equals("")) {
+                    mark.word = pagefactory.getSecLineText().trim();
+                } else {
+                    mark.word = word.trim();
+                }
+                mark.word += "\n" + mark.time;
+                mgr.addMarks(mark);
+                Toast.makeText(getApplication(), "书签添加成功", Toast.LENGTH_SHORT).show();
+                break;
             // 目录
             case R.id.btn_directory:
                 Intent intent = new Intent(this, DirectoryActivity.class);
@@ -487,6 +504,38 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             default:
                 break;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case DIR_CODE:
+                if (data != null) {
+                    int markBegin = data.getExtras().getInt(DIR_KEY);
+                    if (markBegin > 0) {
+                        try {
+                            pagefactory.nextPage();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        pagefactory.setM_mbBufEnd(markBegin);
+                        pagefactory.setM_mbBufBegin(markBegin);
+                        pagefactory.onDraw(mNextPageCanvas);
+                        //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
+                        //mPageWidget.invalidate();
+                        book_image.setImageBitmap(mCurPageBitmap);
+                        postInvalidateUI();
+                    }
+                }
+                break;
+        }
+    }
+
+    public static String getStringCurrentDate() {
+        Date currentTime = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return formatter.format(currentTime);
     }
 
     /**

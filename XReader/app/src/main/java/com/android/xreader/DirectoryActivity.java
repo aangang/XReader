@@ -16,13 +16,14 @@ import android.widget.TextView;
 
 
 import com.android.xreader.db.DBManager;
+import com.android.xreader.module.BookMark;
 
 import java.util.List;
 
 public class DirectoryActivity extends Activity {
     private DBManager mgr;
 
-    //private List<BookMark> bookmarks;
+    private List<BookMark> bookmarks;
 
     private TextView mBookName;
 
@@ -30,7 +31,7 @@ public class DirectoryActivity extends Activity {
 
     private ListView mListView;
 
-    //private MarkAdapter mAdapter;
+    private MarkAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +50,10 @@ public class DirectoryActivity extends Activity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Intent intent = new Intent();
-                //intent.putExtra(MainActivity.DIR_KEY, bookmarks.get(position).begin);
-                //setResult(MainActivity.DIR_CODE, intent);
-                //finish();
+                Intent intent = new Intent();
+                intent.putExtra(MainActivity.DIR_KEY, bookmarks.get(position).begin);
+                setResult(MainActivity.DIR_CODE, intent);
+                finish();
             }
         });
 
@@ -63,20 +64,20 @@ public class DirectoryActivity extends Activity {
             }
         });
 
-        //mAdapter = new MarkAdapter();
+        mAdapter = new MarkAdapter();
         init(getIntent().getExtras().getString(MainActivity.DIR_NAME));
     }
 
     private void init(String filepath) {
-        //bookmarks = mgr.queryMarks(filepath);
-        //if (bookmarks.size() <= 0) {
+        bookmarks = mgr.queryMarks(filepath);
+        if (bookmarks.size() <= 0) {
             mListView.setVisibility(View.GONE);
             mEmptyView.setText("你还没有添加书签");
             mEmptyView.setVisibility(View.VISIBLE);
-        //} else {
-        //    mBookName.setText(filepath);
-         //   mListView.setAdapter(mAdapter);
-        //}
+        } else {
+            mBookName.setText(filepath);
+            mListView.setAdapter(mAdapter);
+        }
     }
 
     @Override
@@ -88,7 +89,7 @@ public class DirectoryActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
-/*    class MarkAdapter extends BaseAdapter {
+    class MarkAdapter extends BaseAdapter {
 
         private LayoutInflater mInflater;
 
@@ -133,5 +134,5 @@ public class DirectoryActivity extends Activity {
         private class Holder {
             TextView word, time;
         }
-    }*/
+    }
 }
