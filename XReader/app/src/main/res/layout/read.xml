@@ -9,6 +9,34 @@
 		android:id="@+id/readlayout"
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent">
+		<FrameLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+			<ImageView
+				android:id="@+id/book_view"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent" />
+			<Button
+				android:id="@+id/prev"
+				android:layout_gravity="bottom|start"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="prev"
+				android:layout_marginBottom="50dp"
+				android:alpha="0.5"
+				/>
+			<Button
+				android:id="@+id/next"
+				android:layout_gravity="bottom|end"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="next"
+				android:layout_marginBottom="50dp"
+				android:alpha="0.5"
+				/>
+
+		</FrameLayout>
+
 	</RelativeLayout>
 
 	<include

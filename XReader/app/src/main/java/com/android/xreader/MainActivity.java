@@ -19,7 +19,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -105,6 +107,9 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     private Boolean mIsMainPopupWindowShowing = false;// 主popwindow是否显示
     private boolean mIsSubPopUpWindowShowing = false;
 
+    ImageView book_image;
+    Button prev,next;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -167,6 +172,24 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             e1.printStackTrace();
             Toast.makeText(this, "no find file", Toast.LENGTH_SHORT).show();
         }
+        prev = (Button) findViewById(R.id.prev);
+        next = (Button) findViewById(R.id.next);
+        prev.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                log("prev  clicked");
+                toPrePage();
+            }
+        });
+        next.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                log("next  clicked");
+                toNextPage();
+            }
+        });
+        book_image = (ImageView) findViewById(R.id.book_view);
+        book_image.setImageBitmap(mCurPageBitmap);
 
         /*mPageWidget.setBitmaps(mCurPageBitmap, mCurPageBitmap);
 
@@ -219,7 +242,6 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 } else {
                     setMainMenuVisibility(true);
                 }
-                toNextPage();
             }
         });
 
@@ -247,6 +269,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         }
         pagefactory.onDraw(mNextPageCanvas);
         //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
+        book_image.setImageBitmap(mNextPageBitmap);
         editor.putInt(filepath + "begin", begin).commit();
     }
 
@@ -265,6 +288,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         }
         pagefactory.onDraw(mNextPageCanvas);
         //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
+        book_image.setImageBitmap(mNextPageBitmap);
         editor.putInt(filepath + "begin", begin).commit();
     }
 
