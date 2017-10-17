@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml:2:1-41:12
+ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml:2:1-44:12
 	package
 		ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml:3:5-34
 		INJECTED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml
@@ -46,7 +46,7 @@ ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/Andr
 	android:name
 		ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml:15:22-81
 application
-ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml:17:5-39:19
+ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml:17:5-42:19
 MERGED from [com.android.support:appcompat-v7:25.2.0] /home/android/work2/android_studio_projects/XReader/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.2.0/AndroidManifest.xml:25:5-20
 MERGED from [com.android.support:support-v4:25.2.0] /home/android/work2/android_studio_projects/XReader/app/build/intermediates/exploded-aar/com.android.support/support-v4/25.2.0/AndroidManifest.xml:25:5-20
 MERGED from [com.android.support:support-fragment:25.2.0] /home/android/work2/android_studio_projects/XReader/app/build/intermediates/exploded-aar/com.android.support/support-fragment/25.2.0/AndroidManifest.xml:25:5-20
@@ -94,6 +94,12 @@ ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/Andr
 		ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml:38:13-49
 	android:name
 		ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml:37:13-46
+activity#com.android.xreader.DirectoryActivity
+ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml:39:9-41:52
+	android:screenOrientation
+		ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml:41:13-49
+	android:name
+		ADDED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml:40:13-46
 uses-sdk
 INJECTED from /home/android/work2/android_studio_projects/XReader/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 MERGED from [com.android.support:appcompat-v7:25.2.0] /home/android/work2/android_studio_projects/XReader/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.2.0/AndroidManifest.xml:21:5-23:78

@@ -36,6 +36,9 @@
         <activity
             android:name=".BookShelfActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".DirectoryActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

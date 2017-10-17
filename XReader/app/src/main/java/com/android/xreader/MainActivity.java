@@ -2,6 +2,7 @@ package com.android.xreader;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -35,6 +36,7 @@ import com.android.xreader.module.BookFile;
 import com.android.xreader.utils.FusionField;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class MainActivity extends Activity implements OnSeekBarChangeListener, OnClickListener {
@@ -346,6 +348,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         mIsMainPopupWindowShowing = true;
 
         //mPopupWindow.showAtLocation(mPageWidget, Gravity.BOTTOM, 0, 0);
+        mPopupWindow.showAtLocation((RelativeLayout) findViewById(R.id.readlayout), Gravity.BOTTOM, 0, 0);
     }
 
     private void setMainMenuVisibility(boolean show) {
@@ -416,6 +419,8 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 }
                 setReadBg();
 
+                pagefactory.onDraw(mCurPageCanvas);
+                book_image.setImageBitmap(mCurPageBitmap);
                 /*mPageWidget.abortAnimation();
                 pagefactory.onDraw(mCurPageCanvas);
                 pagefactory.onDraw(mNextPageCanvas);
@@ -439,10 +444,87 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             case R.id.ib_back_top:
                 finish();
                 break;
+            // 目录
+            case R.id.btn_directory:
+                Intent intent = new Intent(this, DirectoryActivity.class);
+                intent.putExtra(DIR_NAME, filepath);
+                startActivityForResult(intent, DIR_CODE);
+            break;
+            // 字体按钮
+            case R.id.btn_text_size:
+                a = 1;
+                //setToolPop(a);
+                break;
+
+            // 亮度按钮
+            case R.id.btn_brightness:
+                a = 2;
+                setToolPop(a);
+                break;
+            // 进度
+            case R.id.btn_progress:
+                a = 4;
+                //setToolPop(a);
+                break;
 
             default:
                 break;
         }
+    }
+
+    /**
+     * 设置popupwindow的显示与隐藏
+     *
+     * @param a
+     */
+    public void setToolPop(int a) {
+        if (a != 3 && mPopupWindow.isShowing()) {
+            mPopupWindow.dismiss();
+
+            mIsMainPopupWindowShowing = false;
+            mIsSubPopUpWindowShowing = true;
+        }
+
+        // mToolpop.showAtLocation(mPageWidget, Gravity.BOTTOM, 0,
+        // width * 45 / 320);
+        //mToolpop.showAtLocation(mPageWidget, Gravity.BOTTOM, 0, 0);
+        mToolpop.showAtLocation(book_image, Gravity.BOTTOM, 0, 0);
+        topBar.setVisibility(View.VISIBLE);
+        // 点击字体按钮
+        if (a == 1) {
+            //mToolpop1.showAtLocation(mPageWidget, Gravity.BOTTOM, 0, 0);
+            mToolpop1.showAtLocation(book_image, Gravity.BOTTOM, 0, 0);
+            ImageView fontDiscreBtn = (ImageView) toolpop1.findViewById(R.id.iv_font_discre);
+            ImageView fontIncreBtn = (ImageView) toolpop1.findViewById(R.id.iv_font_incre);
+            fontDiscreBtn.setOnClickListener(this);
+            fontIncreBtn.setOnClickListener(this);
+        }
+        // 点击亮度按钮
+        if (a == 2) {
+            //mToolpop2.showAtLocation(mPageWidget, Gravity.BOTTOM, 0, 0);
+            mToolpop2.showAtLocation(book_image, Gravity.BOTTOM, 0, 0);
+            seekBar2 = (SeekBar) toolpop2.findViewById(R.id.seekBar2);
+            // 取得当前亮度
+            seekBar2.setMax(255);
+            // 进度条绑定当前亮度
+            seekBar2.setProgress(light);
+            seekBar2.setOnSeekBarChangeListener(this);
+        }
+        // 点击跳转按钮
+        if (a == 4) {
+            //mToolpop4.showAtLocation(mPageWidget, Gravity.BOTTOM, 0, 0);
+            mToolpop4.showAtLocation(book_image, Gravity.BOTTOM, 0, 0);
+            seekBar4 = (SeekBar) toolpop4.findViewById(R.id.seekBar4);
+            markEdit4 = (TextView) toolpop4.findViewById(R.id.markEdit4);
+            // jumpPage = sp.getInt(bookPath + "jumpPage", 1);
+            float fPercent = (float) (begin * 1.0 / pagefactory.getM_mbBufLen());
+            DecimalFormat df = new DecimalFormat("#0");
+            String strPercent = df.format(fPercent * 100) + "%";
+            markEdit4.setText(strPercent);
+            seekBar4.setProgress(Integer.parseInt(df.format(fPercent * 100)));
+            seekBar4.setOnSeekBarChangeListener(this);
+        }
+
     }
 
     @Override
@@ -457,6 +539,24 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        switch (seekBar.getId()) {
+
+            case R.id.seekBar2:
+                // 取得当前进度
+                int tmpInt = seekBar2.getProgress();
+                // 当进度小于80时，设置成80，防止太黑看不见的后果。
+                if (tmpInt < 80) {
+                    tmpInt = 80;
+                }
+                WindowManager.LayoutParams lp = MainActivity.this.getWindow().getAttributes();
+                lp.screenBrightness = (float) tmpInt * (1f / 255f);
+                MainActivity.this.getWindow().setAttributes(lp);
+                light = tmpInt;
+                break;
+
+            default:
+                break;
+        }
 
     }
 
