@@ -453,7 +453,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             // 字体按钮
             case R.id.btn_text_size:
                 a = 1;
-                //setToolPop(a);
+                setToolPop(a);
                 break;
 
             // 亮度按钮
@@ -464,7 +464,24 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             // 进度
             case R.id.btn_progress:
                 a = 4;
-                //setToolPop(a);
+                setToolPop(a);
+                break;
+            case R.id.iv_font_discre:
+                mCurrentFontSize -= FONT_STEP;
+                pagefactory.setTextSize(mCurrentFontSize);
+                pagefactory.onDraw(mCurPageCanvas);
+                pagefactory.onDraw(mNextPageCanvas);
+                //mPageWidget.invalidate();
+                book_image.setImageBitmap(mCurPageBitmap);
+                break;
+
+            case R.id.iv_font_incre:
+                mCurrentFontSize += FONT_STEP;
+                pagefactory.setTextSize(mCurrentFontSize);
+                pagefactory.onDraw(mCurPageCanvas);
+                pagefactory.onDraw(mNextPageCanvas);
+                //mPageWidget.invalidate();
+                book_image.setImageBitmap(mCurPageBitmap);
                 break;
 
             default:
@@ -553,11 +570,50 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 MainActivity.this.getWindow().setAttributes(lp);
                 light = tmpInt;
                 break;
+            case R.id.seekBar4:
+                markEdit4.setText("" + seekBar4.getProgress() + "%");
 
+                begin = pagefactory.getM_mbBufLen() * seekBar4.getProgress() / 100;
+                if (begin > 0) {
+                    try {
+                        pagefactory.nextPage();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    pagefactory.setM_mbBufEnd(begin);
+                    pagefactory.setM_mbBufBegin(begin);
+                    pagefactory.onDraw(mNextPageCanvas);
+                    //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
+                    //mPageWidget.invalidate();
+                    //postInvalidateUI();
+                    book_image.setImageBitmap(mNextPageBitmap);
+                    postInvalidateUI();
+                }
+                break;
             default:
                 break;
         }
 
+    }
+
+    /**
+     * 刷新界面
+     */
+    public void postInvalidateUI() {
+        //mPageWidget.abortAnimation();
+        pagefactory.onDraw(mCurPageCanvas);
+        try {
+            pagefactory.currentPage();
+            begin = pagefactory.getM_mbBufBegin();// 获取当前阅读位置
+            word = pagefactory.getFirstLineText();// 获取当前阅读位置的首行文字
+        } catch (IOException e1) {
+        }
+
+        pagefactory.onDraw(mNextPageCanvas);
+
+        //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
+        //mPageWidget.postInvalidate();
+        book_image.setImageBitmap(mNextPageBitmap);
     }
 
 
