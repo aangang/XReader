@@ -10,4 +10,5 @@
     <string name="bookpop_light">亮度</string>
     <string name="bookpop_night">夜间</string>
     <string name="bookpop_day">白天</string>
+    <string name="speech_test">语音测试</string>
 </resources>
