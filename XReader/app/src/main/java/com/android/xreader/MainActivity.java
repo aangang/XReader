@@ -32,14 +32,18 @@ import android.widget.Toast;
 import com.android.xreader.db.DBManager;
 import com.android.xreader.module.BookFile;
 import com.android.xreader.module.BookMark;
+import com.android.xreader.tts.KqwSpeechCompound;
 import com.android.xreader.tts.TtsSettings;
 import com.android.xreader.utils.FusionField;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SynthesizerListener;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
 public class MainActivity extends Activity implements OnSeekBarChangeListener, OnClickListener {
 
@@ -115,6 +119,10 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     ImageView book_image;
     Button prev,next;
 
+    //tts
+    private KqwSpeechCompound mKqwSpeechCompound;
+    Vector<String> curPageLines;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,6 +157,10 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         mNextPageCanvas = new Canvas(mNextPageBitmap);
 
         setContentView(R.layout.read);
+
+        // 初始化语音合成对象
+        mKqwSpeechCompound = new KqwSpeechCompound(this);
+        mKqwSpeechCompound.setTtsListener(mTtsListener);
 
         RelativeLayout rlayout = (RelativeLayout) findViewById(R.id.readlayout);
         topBar = findViewById(R.id.top_bar);
@@ -408,7 +420,22 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         btnSpeek.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                log("speek");
+                /*String line =pagefactory.getFirstLineText();
+                if(pagefactory != null && line != null && line != ""){
+                    mKqwSpeechCompound.speaking(line);
+                }*/
+                if(!mKqwSpeechCompound.isSpeaking()) {
+                    curPageLines = pagefactory.getCurrentPageLines();
+                    String page = "";
+                    for (String line : curPageLines) {
+                        page = page + line;
+                    }
+                    log(page);
+                    mKqwSpeechCompound.speaking(page);
+                    log("speek");
+                }else{
+                    mKqwSpeechCompound.stopSpeaking();
+                }
             }
         });
         btnSetting.setOnClickListener(this);
@@ -441,6 +468,74 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             }
         });
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(mKqwSpeechCompound.isSpeaking()){
+            mKqwSpeechCompound.stopSpeaking();
+        }
+    }
+
+    /**
+     * 合成回调监听。
+     */
+    private SynthesizerListener mTtsListener = new SynthesizerListener() {
+        @Override
+        public void onSpeakBegin() {
+            Log.i("txt", "onSpeakBegin");
+        }
+
+        @Override
+        public void onSpeakPaused() {
+            Log.i("txt", "onSpeakPaused");
+        }
+
+        @Override
+        public void onSpeakResumed() {
+            Log.i("txt", "onSpeakResumed");
+        }
+
+        @Override
+        public void onBufferProgress(int percent, int beginPos, int endPos, String info) {
+            // TODO 缓冲的进度
+            Log.i("txt", "onBufferProgress : " + percent);
+        }
+
+        @Override
+        public void onSpeakProgress(int percent, int beginPos, int endPos) {
+            // TODO 说话的进度
+            Log.i("txt", "onSpeakProgress : " + percent);
+        }
+
+        @Override
+        public void onCompleted(SpeechError error) {
+            if (error == null) {
+                Log.i("txt", "onCompleted  toNextPage");
+
+                toNextPage();
+                String page = "";
+                curPageLines = pagefactory.getCurrentPageLines();
+                for(String line:curPageLines){
+                    page = page + line;
+                }
+                log(page);
+                if(page != null && !page.equals("")) {
+                    log("speeking continue");
+                    mKqwSpeechCompound.speaking(page);
+                }
+
+            } else if (error != null) {
+                Log.i("txt", error.getPlainDescription(true));
+            }
+
+        }
+
+        @Override
+        public void onEvent(int eventType, int arg1, int arg2, Bundle obj) {
+
+        }
+    };
 
     @Override
     protected void onDestroy() {

@@ -15,7 +15,7 @@ import com.android.xreader.R;
 /**
  * 合成设置界面
  */
-public class TtsSettings extends PreferenceActivity implements OnPreferenceChangeListener {
+public class TtsSettings extends PreferenceActivity implements OnPreferenceChangeListener ,Preference.OnPreferenceClickListener{
 	
 	public static final String PREFER_NAME = "com.iflytek.setting";
 	private EditTextPreference mSpeedPreference;
@@ -58,6 +58,20 @@ public class TtsSettings extends PreferenceActivity implements OnPreferenceChang
 		speekerPreference.setOnPreferenceChangeListener(this);
 
 	}
+
+	@Override
+	public boolean onPreferenceClick(Preference preference) {
+		final String key = preference.getKey();
+		if("speeker_preference".equals(key)){
+			ListPreference listPreference=(ListPreference)preference;
+			int index=listPreference.findIndexOfValue(speeker);
+			CharSequence[] entries=listPreference.getEntries();
+			listPreference.setSummary(entries[index]);
+		}
+
+		return true;
+	}
+
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
 		final String key = preference.getKey();
@@ -67,6 +81,7 @@ public class TtsSettings extends PreferenceActivity implements OnPreferenceChang
 			CharSequence[] entries=listPreference.getEntries();
 			int index=listPreference.findIndexOfValue((String)newValue);
 			listPreference.setSummary(entries[index]);
+
 
 			editor.putString("speeker", value);
 			editor.commit();

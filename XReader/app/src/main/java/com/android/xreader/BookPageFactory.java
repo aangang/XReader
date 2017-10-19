@@ -391,6 +391,10 @@ public class BookPageFactory {
         return m_lines.size() > 0 ? m_lines.get(1) : "";
     }
 
+    public Vector<String> getCurrentPageLines(){
+        return m_lines.size() > 0 ? m_lines : null;
+    }
+
     public void setM_fontSize(int m_fontSize) {
         this.m_fontSize = m_fontSize;
         mLineCount = (int) (mVisibleHeight / m_fontSize) - 1;

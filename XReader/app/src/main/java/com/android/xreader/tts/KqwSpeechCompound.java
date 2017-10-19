@@ -29,6 +29,8 @@ public class KqwSpeechCompound {
     // 语音合成对象
     private static SpeechSynthesizer mTts;
     private Toast mToast;
+
+    SynthesizerListener mTtsListener;
     /**
      * 发音人
      */
@@ -49,6 +51,7 @@ public class KqwSpeechCompound {
         // 上下文
         mContext = context;
         mToast = Toast.makeText(mContext,"",Toast.LENGTH_SHORT);
+        mTtsListener = mDefaultTtsListener;
         // 初始化合成对象
         mTts = SpeechSynthesizer.createSynthesizer(mContext, new InitListener() {
             @Override
@@ -59,6 +62,10 @@ public class KqwSpeechCompound {
                 }
             }
         });
+    }
+
+    public void setTtsListener(SynthesizerListener ttsListener){
+        this.mTtsListener =ttsListener;
     }
 
     private void showTip(final String str) {
@@ -115,7 +122,7 @@ public class KqwSpeechCompound {
     /**
      * 合成回调监听。
      */
-    private SynthesizerListener mTtsListener = new SynthesizerListener() {
+    private SynthesizerListener mDefaultTtsListener = new SynthesizerListener() {
         @Override
         public void onSpeakBegin() {
             Log.i(TAG, "开始播放");
