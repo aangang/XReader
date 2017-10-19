@@ -14,7 +14,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -27,13 +26,13 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
 import com.android.xreader.db.DBManager;
 import com.android.xreader.module.BookFile;
 import com.android.xreader.module.BookMark;
+import com.android.xreader.tts.TtsSettings;
 import com.android.xreader.utils.FusionField;
 
 import java.io.IOException;
@@ -50,6 +49,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     private static final String TAG = "BookActivity";
 
     public static final int DIR_CODE = 123;
+    public static final int SETTING_CODE = 234;
 
     public static final String DIR_KEY = "begin";
 
@@ -391,6 +391,8 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         TextView btnProgress = (TextView) popupwindwow.findViewById(R.id.btn_progress);
         TextView btnTextSize = (TextView) popupwindwow.findViewById(R.id.btn_text_size);
         TextView btnBrightness = (TextView) popupwindwow.findViewById(R.id.btn_brightness);
+        TextView btnSpeek = (TextView) popupwindwow.findViewById(R.id.btn_speek);
+        TextView btnSetting = (TextView) popupwindwow.findViewById(R.id.btn_setting);
         final TextView btnNight = (TextView) popupwindwow.findViewById(R.id.btn_night);
         final Drawable drawableNight = getResources().getDrawable(R.drawable.btn_night);
         // drawableNight.setBounds(0,0,20,20);
@@ -403,6 +405,13 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             btnNight.setText(getString(R.string.bookpop_day));
             btnNight.setCompoundDrawablesWithIntrinsicBounds(null, drawableDay, null, null);
         }
+        btnSpeek.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                log("speek");
+            }
+        });
+        btnSetting.setOnClickListener(this);
 
         btnDirectory.setOnClickListener(this);
         btnProgress.setOnClickListener(this);
@@ -501,6 +510,10 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 book_image.setImageBitmap(mCurPageBitmap);
                 break;
 
+            case R.id.btn_setting:
+                Intent setting = new Intent(MainActivity.this,TtsSettings.class);
+                startActivityForResult(setting,SETTING_CODE);
+                break;
             default:
                 break;
         }
@@ -528,6 +541,9 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                         postInvalidateUI();
                     }
                 }
+                break;
+            case SETTING_CODE:
+                log("from tts setting");
                 break;
         }
     }

@@ -20,6 +20,16 @@
 		android:layout_marginBottom="3dp">
 
 		<TextView
+			android:id="@+id/btn_speek"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:drawableTop="@drawable/speech_icon"
+			android:drawablePadding="5px"
+			android:gravity="center"
+			android:textColor="@color/txt_tool_bar"
+			android:text="@string/bookpop_speek"/>
+		<TextView
 			android:id="@+id/btn_directory"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
@@ -73,6 +83,16 @@
 			android:gravity="center"
 			android:textColor="@color/txt_tool_bar"
 			android:text="@string/bookpop_night"/>
+		<TextView
+			android:id="@+id/btn_setting"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:drawableTop="@drawable/set_icon"
+			android:drawablePadding="5px"
+			android:gravity="center"
+			android:textColor="@color/txt_tool_bar"
+			android:text="@string/bookpop_setting"/>
 	</LinearLayout>
 
 </LinearLayout>

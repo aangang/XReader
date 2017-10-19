@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.android.xreader.utils.KqwSpeechCompound;
+import com.android.xreader.tts.KqwSpeechCompound;
 
 public class SpeechTest extends AppCompatActivity {
     private EditText mEtText;

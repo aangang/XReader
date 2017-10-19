@@ -112,9 +112,9 @@ public class BookPageFactory {
         mLineCount = (int) (mVisibleHeight / m_fontSize);
         m_lines = pageDown(true);
         //print txt as log
-        for(String line:m_lines){
+        /*for(String line:m_lines){
             MainActivity.log("line:" + line.toString());
-        }
+        }*/
 
         // edit.putInt("size", a);
         // edit.commit();
@@ -343,9 +343,9 @@ public class BookPageFactory {
             }
         }
         //print txt as log
-        for(String line:m_lines){
+        /*for(String line:m_lines){
             MainActivity.log("line:" + line.toString());
-        }
+        }*/
         float fPercent = (float) (m_mbBufBegin * 1.0 / m_mbBufLen);
         DecimalFormat df = new DecimalFormat("#0.0");
         String strPercent = df.format(fPercent * 100) + "%";
