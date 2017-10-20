@@ -1,11 +1,12 @@
 package com.android.xreader;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.Log;
+
+import com.android.xreader.utils.SharedPreferencesUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,10 +51,6 @@ public class BookPageFactory {
 
     public int m_fontSize;// 字体大小
 
-    SharedPreferences preferences;
-
-    SharedPreferences.Editor edit;
-
     private int m_textColor = 0xFF562A16;
 
     private int m_backColor = 0xffff9e85;
@@ -80,9 +77,8 @@ public class BookPageFactory {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setTextAlign(Paint.Align.LEFT);
         // ----------------------------------------
-        preferences = context.getSharedPreferences("config", Context.MODE_PRIVATE);
-        edit = preferences.edit();
-        int size = preferences.getInt("size", 30);
+
+        int size = (int)SharedPreferencesUtils.getParam(context,"size",30);
         m_fontSize = size;
         // -----------------------------------------------
         mPaint.setTextSize(m_fontSize);

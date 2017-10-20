@@ -1,6 +1,5 @@
 package com.android.xreader.tts;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -10,6 +9,7 @@ import android.preference.PreferenceActivity;
 import android.view.Window;
 
 import com.android.xreader.R;
+import com.android.xreader.utils.SharedPreferencesUtils;
 
 
 /**
@@ -23,8 +23,6 @@ public class TtsSettings extends PreferenceActivity implements OnPreferenceChang
 	private EditTextPreference mVolumePreference;
 	private ListPreference speekerPreference;
 
-	private SharedPreferences sp;
-	private SharedPreferences.Editor editor;
 	String speeker = "";
 	
 	@SuppressWarnings("deprecation")
@@ -46,10 +44,7 @@ public class TtsSettings extends PreferenceActivity implements OnPreferenceChang
 		mVolumePreference.getEditText().addTextChangedListener(new SettingTextWatcher(TtsSettings.this,mVolumePreference,0,100));
 */
 
-		sp = getSharedPreferences("config", MODE_PRIVATE);
-		editor = sp.edit();
-
-		speeker = sp.getString("speeker", "xiaoyan");
+		speeker = (String) SharedPreferencesUtils.getParam(this,"speeker","xiaoyan");
 
 		speekerPreference = (ListPreference) findPreference("speeker_preference");
 		CharSequence[] entries=speekerPreference.getEntries();
@@ -82,9 +77,7 @@ public class TtsSettings extends PreferenceActivity implements OnPreferenceChang
 			int index=listPreference.findIndexOfValue((String)newValue);
 			listPreference.setSummary(entries[index]);
 
-
-			editor.putString("speeker", value);
-			editor.commit();
+			SharedPreferencesUtils.setParam(this,"speeker", value);
 		}
 
 		 return true;

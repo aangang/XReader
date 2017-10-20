@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.xreader.utils.SharedPreferencesUtils;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
@@ -32,7 +33,6 @@ public class KqwSpeechCompound {
     private Toast mToast;
 
     SynthesizerListener mTtsListener;
-    private SharedPreferences sp;
     String mSpeeker = "xiaoyan";
     String mSpeed = "50";
     String mPitch = "50";
@@ -60,12 +60,11 @@ public class KqwSpeechCompound {
         mContext = context;
         mToast = Toast.makeText(mContext,"",Toast.LENGTH_SHORT);
         mTtsListener = mDefaultTtsListener;
-        sp = mContext.getSharedPreferences("config", mContext.MODE_PRIVATE);
 
-        mSpeeker = sp.getString("speeker","xiaoyan");
-        mSpeed = sp.getString("speed_preference", "50");
-        mPitch = sp.getString("pitch_preference", "50");
-        mVolume = sp.getString("volume_preference", "100");
+        mSpeeker = (String) SharedPreferencesUtils.getParam(mContext,"speeker","xiaoyan");
+        mSpeed = (String) SharedPreferencesUtils.getParam(mContext,"speed_preference","50");
+        mPitch = (String) SharedPreferencesUtils.getParam(mContext,"pitch_preference", "50");
+        mVolume = (String) SharedPreferencesUtils.getParam(mContext,"volume_preference", "100");
 
         // 初始化合成对象
         mTts = SpeechSynthesizer.createSynthesizer(mContext, new InitListener() {
@@ -191,10 +190,10 @@ public class KqwSpeechCompound {
      */
     private void setParam() {
 
-        mSpeeker = sp.getString("speeker","xiaoyan");
-        mSpeed = sp.getString("speed_preference", "50");
-        mPitch = sp.getString("pitch_preference", "50");
-        mVolume = sp.getString("volume_preference", "100");
+        mSpeeker = (String) SharedPreferencesUtils.getParam(mContext,"speeker","xiaoyan");
+        mSpeed = (String) SharedPreferencesUtils.getParam(mContext,"speed_preference","50");
+        mPitch = (String) SharedPreferencesUtils.getParam(mContext,"pitch_preference", "50");
+        mVolume = (String) SharedPreferencesUtils.getParam(mContext,"volume_preference", "100");
 
         // 清空参数
         mTts.setParameter(SpeechConstant.PARAMS, null);

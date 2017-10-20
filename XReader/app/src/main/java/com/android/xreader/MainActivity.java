@@ -3,7 +3,6 @@ package com.android.xreader;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,6 +34,7 @@ import com.android.xreader.module.BookMark;
 import com.android.xreader.tts.KqwSpeechCompound;
 import com.android.xreader.tts.TtsSettings;
 import com.android.xreader.utils.FusionField;
+import com.android.xreader.utils.SharedPreferencesUtils;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SynthesizerListener;
 
@@ -74,10 +74,6 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     private int height;
 
     private static int begin = 0;// 记录的书籍开始位置
-
-    private SharedPreferences sp;
-
-    private SharedPreferences.Editor editor;
 
     private int light; // 亮度值
 
@@ -141,13 +137,12 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         width = dm.widthPixels;
         height = dm.heightPixels;
 
-        sp = getSharedPreferences("config", MODE_PRIVATE);
-        editor = sp.edit();
         // 读取SP记录
-        begin = sp.getInt(filepath + "begin", 0);
-        light = sp.getInt("light", 5);
-        isNight = sp.getBoolean("night", false);
-        size = sp.getInt("size", defaultSize);
+        begin =(int)SharedPreferencesUtils.getParam(this,filepath + "begin", 0);
+        light =(int)SharedPreferencesUtils.getParam(this,"light", 5);
+        isNight =(boolean)SharedPreferencesUtils.getParam(this,"night", false);
+        size =(int)SharedPreferencesUtils.getParam(this,"size", defaultSize);
+
         //page view
         //mPageWidget = new PageWidget(this, width, height);
         // 当前页
@@ -289,7 +284,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         pagefactory.onDraw(mNextPageCanvas);
         //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
         book_image.setImageBitmap(mNextPageBitmap);
-        editor.putInt(filepath + "begin", begin).commit();
+        SharedPreferencesUtils.setParam(this,filepath + "begin", begin);
     }
 
 
@@ -308,7 +303,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         pagefactory.onDraw(mNextPageCanvas);
         //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
         book_image.setImageBitmap(mNextPageBitmap);
-        editor.putInt(filepath + "begin", begin).commit();
+        SharedPreferencesUtils.setParam(this,filepath + "begin", begin);
     }
 
     /**
@@ -788,11 +783,11 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
 
     private void saveSp() {
-        editor.putInt("light", light);
-        editor.putBoolean("night", isNight);
-        editor.putInt("size", size);
-        editor.putInt(filepath + "begin", begin);
-        editor.commit();
+
+        SharedPreferencesUtils.setParam(this,"light", light);
+        SharedPreferencesUtils.setParam(this,"night", isNight);
+        SharedPreferencesUtils.setParam(this,"size", size);
+        SharedPreferencesUtils.setParam(this,filepath + "begin", begin);
     }
 
     private void initTopBar() {
