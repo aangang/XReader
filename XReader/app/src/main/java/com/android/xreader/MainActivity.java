@@ -123,6 +123,8 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     private KqwSpeechCompound mKqwSpeechCompound;
     Vector<String> curPageLines;
 
+    String mPageLines = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -403,7 +405,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         TextView btnProgress = (TextView) popupwindwow.findViewById(R.id.btn_progress);
         TextView btnTextSize = (TextView) popupwindwow.findViewById(R.id.btn_text_size);
         TextView btnBrightness = (TextView) popupwindwow.findViewById(R.id.btn_brightness);
-        TextView btnSpeek = (TextView) popupwindwow.findViewById(R.id.btn_speek);
+        final TextView btnSpeek = (TextView) popupwindwow.findViewById(R.id.btn_speek);
         TextView btnSetting = (TextView) popupwindwow.findViewById(R.id.btn_setting);
         final TextView btnNight = (TextView) popupwindwow.findViewById(R.id.btn_night);
         final Drawable drawableNight = getResources().getDrawable(R.drawable.btn_night);
@@ -431,10 +433,13 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                         page = page + line;
                     }
                     log(page);
+                    btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.pause_ic,0,0);
+                    mPageLines = page;
                     mKqwSpeechCompound.speaking(page);
                     log("speek");
                 }else{
                     mKqwSpeechCompound.stopSpeaking();
+                    btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.play_ic,0,0);
                 }
             }
         });
@@ -520,6 +525,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                     page = page + line;
                 }
                 log(page);
+                mPageLines = page;
                 if(page != null && !page.equals("")) {
                     log("speeking continue");
                     mKqwSpeechCompound.speaking(page);
@@ -639,6 +645,9 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 break;
             case SETTING_CODE:
                 log("from tts setting");
+                mKqwSpeechCompound.stopSpeaking();
+                mKqwSpeechCompound.speaking(mPageLines);
+
                 break;
         }
     }

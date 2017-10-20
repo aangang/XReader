@@ -4,6 +4,7 @@ package com.android.xreader.tts;
  * Created by Administrator on 2017/10/18.
  */
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,6 +32,13 @@ public class KqwSpeechCompound {
     private Toast mToast;
 
     SynthesizerListener mTtsListener;
+    private SharedPreferences sp;
+    String mSpeeker = "xiaoyan";
+    String mSpeed = "50";
+    String mPitch = "50";
+    String mVolume = "100";
+
+
     /**
      * 发音人
      */
@@ -52,6 +60,13 @@ public class KqwSpeechCompound {
         mContext = context;
         mToast = Toast.makeText(mContext,"",Toast.LENGTH_SHORT);
         mTtsListener = mDefaultTtsListener;
+        sp = mContext.getSharedPreferences("config", mContext.MODE_PRIVATE);
+
+        mSpeeker = sp.getString("speeker","xiaoyan");
+        mSpeed = sp.getString("speed_preference", "50");
+        mPitch = sp.getString("pitch_preference", "50");
+        mVolume = sp.getString("volume_preference", "100");
+
         // 初始化合成对象
         mTts = SpeechSynthesizer.createSynthesizer(mContext, new InitListener() {
             @Override
@@ -79,6 +94,8 @@ public class KqwSpeechCompound {
      * @param text
      */
     public void speaking(String text) {
+        //set params
+        setParam();
         // 非空判断
         if (TextUtils.isEmpty(text)) {
             return;
@@ -173,18 +190,24 @@ public class KqwSpeechCompound {
      * @return
      */
     private void setParam() {
+
+        mSpeeker = sp.getString("speeker","xiaoyan");
+        mSpeed = sp.getString("speed_preference", "50");
+        mPitch = sp.getString("pitch_preference", "50");
+        mVolume = sp.getString("volume_preference", "100");
+
         // 清空参数
         mTts.setParameter(SpeechConstant.PARAMS, null);
         // 引擎类型 网络
         mTts.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
         // 设置发音人
-        mTts.setParameter(SpeechConstant.VOICE_NAME, COLOUD_VOICERS_VALUE[0]);
+        mTts.setParameter(SpeechConstant.VOICE_NAME, mSpeeker/*COLOUD_VOICERS_VALUE[0]*/);
         // 设置语速
-        mTts.setParameter(SpeechConstant.SPEED, "50");
+        mTts.setParameter(SpeechConstant.SPEED, mSpeed);
         // 设置音调
-        mTts.setParameter(SpeechConstant.PITCH, "50");
+        mTts.setParameter(SpeechConstant.PITCH, mPitch);
         // 设置音量
-        mTts.setParameter(SpeechConstant.VOLUME, "100");
+        mTts.setParameter(SpeechConstant.VOLUME, mVolume);
         // 设置播放器音频流类型
         mTts.setParameter(SpeechConstant.STREAM_TYPE, "3");
 
