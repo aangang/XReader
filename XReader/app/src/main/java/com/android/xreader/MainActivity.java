@@ -118,6 +118,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     Vector<String> curPageLines;
 
     String mPageLines = "";
+    boolean isSpeeking = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -434,9 +435,11 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                     btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.pause_ic,0,0);
                     mPageLines = page;
                     mKqwSpeechCompound.speaking(page);
+                    isSpeeking = true;
                     log("speek");
                 }else{
                     mKqwSpeechCompound.stopSpeaking();
+                    isSpeeking = false;
                     btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.play_ic,0,0);
                 }
             }
@@ -475,6 +478,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     @Override
     protected void onStop() {
         super.onStop();
+        log("Main onStop");
         if(mKqwSpeechCompound.isSpeaking()){
             mKqwSpeechCompound.stopSpeaking();
         }
@@ -643,8 +647,10 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 break;
             case SETTING_CODE:
                 log("from tts setting");
-                mKqwSpeechCompound.stopSpeaking();
-                mKqwSpeechCompound.speaking(mPageLines);
+                if(isSpeeking) {
+                    mKqwSpeechCompound.stopSpeaking();
+                    mKqwSpeechCompound.speaking(mPageLines);
+                }
 
                 break;
         }
