@@ -77,8 +77,6 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
     private int light; // 亮度值
 
-    private int size; // 字体大小
-
     private static String word = "";// 记录当前页面的文字
 
     // catch路径
@@ -141,7 +139,12 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         begin =(int)SharedPreferencesUtils.getParam(this,filepath + "begin", 0);
         light =(int)SharedPreferencesUtils.getParam(this,"light", 5);
         isNight =(boolean)SharedPreferencesUtils.getParam(this,"night", false);
-        size =(int)SharedPreferencesUtils.getParam(this,"size", defaultSize);
+        mCurrentFontSize =(int)SharedPreferencesUtils.getParam(this,"size", defaultSize);
+
+        //set brightness
+        WindowManager.LayoutParams lp = MainActivity.this.getWindow().getAttributes();
+        lp.screenBrightness = (float) light * (1f / 255f);
+        MainActivity.this.getWindow().setAttributes(lp);
 
         //page view
         //mPageWidget = new PageWidget(this, width, height);
@@ -180,7 +183,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 pagefactory.openbook(filecatchpath + "catch.txt", begin);
             }
             log("book opened :" + bookFile.name);
-            pagefactory.setM_fontSize(size);
+            pagefactory.setM_fontSize(mCurrentFontSize);
             pagefactory.onDraw(mCurPageCanvas);
         } catch (IOException e1) {
             e1.printStackTrace();
@@ -786,7 +789,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
         SharedPreferencesUtils.setParam(this,"light", light);
         SharedPreferencesUtils.setParam(this,"night", isNight);
-        SharedPreferencesUtils.setParam(this,"size", size);
+        SharedPreferencesUtils.setParam(this,"size", mCurrentFontSize);
         SharedPreferencesUtils.setParam(this,filepath + "begin", begin);
     }
 
