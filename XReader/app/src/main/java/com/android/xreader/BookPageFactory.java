@@ -292,7 +292,7 @@ public class BookPageFactory {
         return buf;
     }
 
-    protected void prePage() throws IOException {
+    public void prePage() throws IOException {
         if (m_mbBufBegin <= 0) {
             m_mbBufBegin = 0;
             m_isfirstPage = true;

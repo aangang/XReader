@@ -1,5 +1,7 @@
 package com.android.xreader.services;
 
+import android.graphics.Bitmap;
+
 import com.iflytek.cloud.SynthesizerListener;
 
 /**
@@ -7,11 +9,21 @@ import com.iflytek.cloud.SynthesizerListener;
  */
 
 public interface TTSControler {
-    void startSpeeking(String page);
+    void startSpeeking();
 
     void stopSpeeking();
 
     boolean isSpeeking();
 
-    void setTTSListener(SynthesizerListener listener);
+    Bitmap getCurrentPageBitmap();
+    Bitmap getNextPageBitmap();
+    Bitmap toNextPage();
+    Bitmap toPrevPage();
+    void addBookMard();
+    void fontDiscre();
+    void fontIncre();
+    int getBegin();
+    int getFontSize();
+    void setPageBG(boolean isNight);
+
 }
