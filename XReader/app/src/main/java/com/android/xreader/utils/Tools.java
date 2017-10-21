@@ -1,6 +1,7 @@
 package com.android.xreader.utils;
 
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -8,7 +9,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class Tools {
+
+	public static final String tag = "txt";
+
 	public Tools() {
+	}
+
+	public static void log(String string){
+		Log.i(tag, string);
 	}
 
 	/**

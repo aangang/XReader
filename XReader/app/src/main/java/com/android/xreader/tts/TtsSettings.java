@@ -1,6 +1,7 @@
 package com.android.xreader.tts;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -42,6 +43,8 @@ public class TtsSettings extends PreferenceActivity implements OnPreferenceChang
 
 	String speeker = "";
 	int speed,pitch,volume;
+
+	boolean isSettingChanged = false;
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -123,7 +126,9 @@ public class TtsSettings extends PreferenceActivity implements OnPreferenceChang
 			hideSeekbar();
 		}else{
 			//super.onBackPressed();
-			setResult(MainActivity.SETTING_CODE, null);
+			Intent intent = new Intent();
+			intent.putExtra(MainActivity.SETTING_KEY, isSettingChanged);
+			setResult(MainActivity.SETTING_CODE, intent);
 			finish();
 		}
 	}
@@ -179,6 +184,7 @@ public class TtsSettings extends PreferenceActivity implements OnPreferenceChang
 			MainActivity.log("volum bar");
 			volume = progress;
 		}
+		isSettingChanged=true;
 	}
 
 	@Override
@@ -214,6 +220,8 @@ public class TtsSettings extends PreferenceActivity implements OnPreferenceChang
 			listPreference.setSummary(entries[index]);
 
 			SharedPreferencesUtils.setParam(this,"speeker", value);
+
+			isSettingChanged = true;
 		}
 
 		 return true;

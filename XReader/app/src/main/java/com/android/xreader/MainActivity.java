@@ -1,14 +1,17 @@
 package com.android.xreader;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -31,10 +34,13 @@ import android.widget.Toast;
 import com.android.xreader.db.DBManager;
 import com.android.xreader.module.BookFile;
 import com.android.xreader.module.BookMark;
+import com.android.xreader.services.TTSControler;
+import com.android.xreader.services.TTSService;
 import com.android.xreader.tts.KqwSpeechCompound;
 import com.android.xreader.tts.TtsSettings;
 import com.android.xreader.utils.FusionField;
 import com.android.xreader.utils.SharedPreferencesUtils;
+import com.android.xreader.utils.Tools;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SynthesizerListener;
 
@@ -48,13 +54,14 @@ import java.util.Vector;
 public class MainActivity extends Activity implements OnSeekBarChangeListener, OnClickListener {
 
 
-    public static final String tag = "txt";
+    public static final String tag = Tools.tag;
 
     private static final String TAG = "BookActivity";
 
     public static final int DIR_CODE = 123;
     public static final int SETTING_CODE = 234;
 
+    public static final String SETTING_KEY = "setting";
     public static final String DIR_KEY = "begin";
 
     public static final String DIR_NAME = "filepath";
@@ -119,6 +126,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
     String mPageLines = "";
     boolean isSpeeking = false;
+    TTSControler ttsControler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -263,6 +271,43 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             }
         });
 
+        Intent intent = new Intent(this, TTSService.class);
+        //混合调用
+        //为了把服务所在进程变成服务进程
+        startService(intent);
+        //为了拿到中间对象
+        bindService(intent, TTSConn, BIND_AUTO_CREATE);
+
+
+
+    }
+
+    //TTS service
+    private ServiceConnection TTSConn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            ttsControler = (TTSControler) service;
+            ttsControler.setTTSListener(mTtsListener);
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
+
+    public void startSpeeking(String page) {
+        Tools.log("Main startSpeeking");
+        ttsControler.startSpeeking(page);
+    }
+
+    public void stopSpeeking() {
+        Tools.log("Main stopSpeeking");
+        ttsControler.stopSpeeking();
+    }
+
+    public boolean isSpeeking() {
+        Tools.log("Main isSpeeking");
+        return ttsControler.isSpeeking();
     }
 
     public static void log(String string){
@@ -425,7 +470,8 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 if(pagefactory != null && line != null && line != ""){
                     mKqwSpeechCompound.speaking(line);
                 }*/
-                if(!mKqwSpeechCompound.isSpeaking()) {
+                //11111111
+                /*if(!mKqwSpeechCompound.isSpeaking()) {
                     curPageLines = pagefactory.getCurrentPageLines();
                     String page = "";
                     for (String line : curPageLines) {
@@ -441,6 +487,25 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                     mKqwSpeechCompound.stopSpeaking();
                     isSpeeking = false;
                     btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.play_ic,0,0);
+                }*/
+
+                if(!ttsControler.isSpeeking()){
+                    curPageLines = pagefactory.getCurrentPageLines();
+                    String page = "";
+                    for (String line : curPageLines) {
+                        page = page + line;
+                    }
+                    log(page);
+                    btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.pause_ic,0,0);
+                    mPageLines = page;
+                    ttsControler.startSpeeking(mPageLines);
+
+                    isSpeeking = true;
+                }else{
+                    ttsControler.stopSpeeking();
+                    btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.play_ic,0,0);
+
+                    isSpeeking = false;
                 }
             }
         });
@@ -479,9 +544,13 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     protected void onStop() {
         super.onStop();
         log("Main onStop");
-        if(mKqwSpeechCompound.isSpeaking()){
+        //111111111
+        /*if(mKqwSpeechCompound.isSpeaking()){
             mKqwSpeechCompound.stopSpeaking();
-        }
+        }*/
+        /*if(ttsControler.isSpeeking()){
+            ttsControler.stopSpeeking();
+        }*/
     }
 
     /**
@@ -530,7 +599,8 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 mPageLines = page;
                 if(page != null && !page.equals("")) {
                     log("speeking continue");
-                    mKqwSpeechCompound.speaking(page);
+                    //mKqwSpeechCompound.speaking(page);
+                    ttsControler.startSpeeking(mPageLines);
                 }
 
             } else if (error != null) {
@@ -549,6 +619,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     protected void onDestroy() {
         super.onDestroy();
         mgr.closeDB();
+        unbindService(TTSConn);
         saveSp();
     }
 
@@ -647,9 +718,18 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 break;
             case SETTING_CODE:
                 log("from tts setting");
-                if(isSpeeking) {
+                //111111111
+                /*if(isSpeeking) {
                     mKqwSpeechCompound.stopSpeaking();
                     mKqwSpeechCompound.speaking(mPageLines);
+                }*/
+
+                if (data != null) {
+                    boolean settingChanged = data.getExtras().getBoolean(SETTING_KEY);
+                    if(settingChanged && ttsControler.isSpeeking()){
+                        ttsControler.stopSpeeking();
+                        ttsControler.startSpeeking(mPageLines);
+                    }
                 }
 
                 break;
