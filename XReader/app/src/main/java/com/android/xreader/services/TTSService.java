@@ -70,8 +70,11 @@ public class TTSService extends Service {
     public IBinder onBind(Intent intent) {
         //throw new UnsupportedOperationException("Not yet implemented");
         Tools.log("onBind service %%%%%%%%%%%%%%%%%%%%%%%");
+        BookFile bookFile = (BookFile) intent.getExtras().getSerializable("path");
+        filepath = bookFile.name;
         // 读取SP记录
         begin =(int) SharedPreferencesUtils.getParam(this,filepath + "begin", 0);
+        Tools.log("begin:" + begin + "   %%%%%%%%%%%%%%%%%%%%%%%%%%  filepath:" + filepath);
         mCurrentFontSize =(int)SharedPreferencesUtils.getParam(this,"size", defaultSize);
 
         width = intent.getExtras().getInt("width");
@@ -84,8 +87,6 @@ public class TTSService extends Service {
         mCurPageCanvas = new Canvas(mCurPageBitmap);
         mNextPageCanvas = new Canvas(mNextPageBitmap);
 
-        BookFile bookFile = (BookFile) intent.getExtras().getSerializable("path");
-        filepath = bookFile.name;
         // 工厂
         pagefactory = new BookPageFactory(this, width, height);
 
