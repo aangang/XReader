@@ -471,7 +471,11 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         switch (v.getId()) {
 
             case R.id.ib_back_top:
-                finish();
+                if(isSpeeking){
+                    Toast.makeText(this,"正在阅读，如要退出，需先停止阅读",Toast.LENGTH_SHORT).show();
+                }else {
+                    finish();
+                }
                 break;
             case R.id.ib_add_mark_top:
                 ttsControler.addBookMard();
@@ -658,6 +662,22 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 break;
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        //实现Home键效果
+        //super.onBackPressed();这句话一定要注掉,不然又去调用默认的back处理方式了
+        /*Intent i= new Intent(Intent.ACTION_MAIN);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.addCategory(Intent.CATEGORY_HOME);
+        startActivity(i);*/
+
+        if(isSpeeking){
+            Toast.makeText(this,"正在阅读，如要退出，需先停止阅读",Toast.LENGTH_SHORT).show();
+        }else{
+            super.onBackPressed();
+        }
     }
 
     private void saveSp() {
