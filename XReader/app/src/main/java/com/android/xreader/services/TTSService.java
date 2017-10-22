@@ -1,5 +1,7 @@
 package com.android.xreader.services;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,9 +12,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.android.xreader.BookPageFactory;
+import com.android.xreader.MainActivity;
 import com.android.xreader.R;
 import com.android.xreader.db.DBManager;
 import com.android.xreader.module.BookFile;
@@ -63,6 +67,54 @@ public class TTSService extends Service {
 
     public TTSService() {
 
+
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+
+        // 参数一：唯一的通知标识；参数二：通知消息。
+        startForeground(110, makeCustomNotification());// 开始前台服务
+    }
+
+    Notification makeCustomNotification(){
+        Notification.Builder builder = new Notification.Builder
+                (this.getApplicationContext()); //获取一个Notification构造器
+        RemoteViews remoteViews = new RemoteViews(this.getPackageName(),R.layout.notification_layout);// 获取remoteViews（参数一：包名；参数二：布局资源）
+        builder = new Notification.Builder(this.getApplicationContext())
+            .setContent(remoteViews);// 设置自定义的Notification内容
+        Intent nfIntent = new Intent(this, MainActivity.class);
+        builder.setContentIntent(PendingIntent.getActivity(this, 0, nfIntent, 0)) // 设置PendingIntent
+            .setWhen(System.currentTimeMillis())
+            .setSmallIcon(R.drawable.header);
+        Notification notification = builder.getNotification();// 获取构建好的通知--.build()最低要求在
+        // API16及以上版本上使用，低版本上可以使用.getNotification()。
+        return notification;
+    }
+    Notification makeNotification(){
+        Notification.Builder builder = new Notification.Builder
+                (this.getApplicationContext()); //获取一个Notification构造器
+        Intent nfIntent = new Intent(this, MainActivity.class);
+        builder.setContentIntent(PendingIntent.getActivity(this, 0, nfIntent, 0)) // 设置PendingIntent
+                .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.drawable.noti_bg)) // 设置下拉列表中的图标(大图标)
+                .setSmallIcon(R.drawable.header) // 设置状态栏内的小图标
+                //.setContentText("要显示的内容") // 设置上下文内容
+                //.setContentTitle("下拉列表中的Title") // 设置下拉列表里的标题
+                .setWhen(System.currentTimeMillis()); // 设置该通知发生的时间
+        Notification notification = builder.build(); // 获取构建好的Notification
+        //notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
+        return notification;
+
+    }
+
+    @Override
+    public void onDestroy() {
+
+        stopForeground(true);// 停止前台服务--参数：表示是否移除之前的通知
+        mgr.closeDB();
+        super.onDestroy();
 
     }
 
@@ -334,12 +386,6 @@ public class TTSService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         return super.onUnbind(intent);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mgr.closeDB();
     }
 
     public void startSpeeking(String lines){
