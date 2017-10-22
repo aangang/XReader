@@ -61,10 +61,13 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
     public static final int DIR_CODE = 123;
     public static final int SETTING_CODE = 234;
+    public static final int TIMER_CODE = 345;
 
     public static final String SETTING_KEY = "setting";
+    public static final String TIMER_KEY = "timer_setting";
     public static final String DIR_KEY = "begin";
     public static final String DIR_NAME = "filepath";
+
 
     //private PageWidget mPageWidget;
 
@@ -392,6 +395,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         TextView btnBrightness = (TextView) popupwindwow.findViewById(R.id.btn_brightness);
         final TextView btnSpeek = (TextView) popupwindwow.findViewById(R.id.btn_speek);
         TextView btnSetting = (TextView) popupwindwow.findViewById(R.id.btn_setting);
+        TextView btnTimer = (TextView) popupwindwow.findViewById(R.id.btn_timer);
         final TextView btnNight = (TextView) popupwindwow.findViewById(R.id.btn_night);
         final Drawable drawableNight = getResources().getDrawable(R.drawable.btn_night);
         // drawableNight.setBounds(0,0,20,20);
@@ -422,6 +426,8 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             }
         });
         btnSetting.setOnClickListener(this);
+
+        btnTimer.setOnClickListener(this);
 
         btnDirectory.setOnClickListener(this);
         btnProgress.setOnClickListener(this);
@@ -521,6 +527,10 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 Intent setting = new Intent(MainActivity.this,TtsSettings.class);
                 startActivityForResult(setting,SETTING_CODE);
                 break;
+            case R.id.btn_timer:
+                Intent timer = new Intent(MainActivity.this,TimerSettingActivity.class);
+                startActivityForResult(timer,TIMER_CODE);
+                break;
             default:
                 break;
         }
@@ -551,14 +561,19 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 break;
             case SETTING_CODE:
                 log("from tts setting");
-
                 if (data != null) {
                     boolean settingChanged = data.getExtras().getBoolean(SETTING_KEY);
                     if(settingChanged){
                         speekOrNot();
                     }
                 }
+                break;
+            case TIMER_CODE:
+                log("from tts timer");
+                if (data != null) {
+                    int timerSetting = data.getExtras().getInt(TIMER_KEY);
 
+                }
                 break;
         }
     }
