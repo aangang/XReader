@@ -58,6 +58,8 @@ public class TTSService extends Service {
     Bitmap mCurPageBitmap, mNextPageBitmap;
     Canvas mCurPageCanvas, mNextPageCanvas;
 
+    PageFlipingControler mPageFlipinger;
+
 
     public TTSService() {
 
@@ -203,6 +205,26 @@ public class TTSService extends Service {
         }
 
         @Override
+        public float getCurrPercent() {
+            return (float) (getBegin() * 1.0 / pagefactory.getM_mbBufLen());
+        }
+
+        @Override
+        public void setCurrPercent(int progress) {
+            begin = pagefactory.getM_mbBufLen() * progress / 100;
+            if (begin > 0) {
+                try {
+                    pagefactory.nextPage();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                pagefactory.setM_mbBufEnd(begin);
+                pagefactory.setM_mbBufBegin(begin);
+                pagefactory.onDraw(mCurPageCanvas);
+            }
+        }
+
+        @Override
         public void fontDiscre() {
             mCurrentFontSize -= FONT_STEP;
             pagefactory.setTextSize(mCurrentFontSize);
@@ -236,6 +258,11 @@ public class TTSService extends Service {
             } else {
                 pagefactory.setBgBitmap(BitmapFactory.decodeResource(TTSService.this.getResources(), R.drawable.bg_book_day));
             }
+        }
+
+        @Override
+        public void setPageFlipinger(PageFlipingControler pageFlipinger) {
+            TTSService.this.mPageFlipinger = pageFlipinger;
         }
     }
 
@@ -276,6 +303,7 @@ public class TTSService extends Service {
                 Log.i("txt", "onCompleted  toNextPage");
 
                 toNextPage();
+                mPageFlipinger.showNextPage();
                 String page = "";
                 curPageLines = pagefactory.getCurrentPageLines();
                 for(String line:curPageLines){

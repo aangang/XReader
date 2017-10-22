@@ -25,5 +25,9 @@ public interface TTSControler {
     int getBegin();
     int getFontSize();
     void setPageBG(boolean isNight);
+    void setPageFlipinger(PageFlipingControler pageFlipinger);
+
+    float getCurrPercent();
+    void setCurrPercent(int progress);
 
 }

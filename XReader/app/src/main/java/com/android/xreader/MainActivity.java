@@ -34,6 +34,7 @@ import android.widget.Toast;
 import com.android.xreader.db.DBManager;
 import com.android.xreader.module.BookFile;
 import com.android.xreader.module.BookMark;
+import com.android.xreader.services.PageFlipingControler;
 import com.android.xreader.services.TTSControler;
 import com.android.xreader.services.TTSService;
 import com.android.xreader.tts.KqwSpeechCompound;
@@ -67,9 +68,6 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
     //private PageWidget mPageWidget;
 
-    //Bitmap mCurPageBitmap, mNextPageBitmap;
-    //Canvas mCurPageCanvas, mNextPageCanvas;
-
     BookPageFactory pagefactory;
 
     private String filepath;
@@ -78,14 +76,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
     private int height;
 
-    //private static int begin = 0;// 记录的书籍开始位置
-
     private int light; // 亮度值
-
-    private static String word = "";// 记录当前页面的文字
-
-    // catch路径
-    private String filecatchpath = "/data/data/" + FusionField.baseActivity.getPackageName() + "/";
 
     private PopupWindow mPopupWindow, mToolpop, mToolpop1, mToolpop2, mToolpop4;
 
@@ -99,14 +90,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
     private TextView markEdit4;
 
-    int defaultSize = 30;
-
-    // int readHeight; // 电子书显示高度
     private Context mContext = null;
-
-    //private DBManager mgr;
-
-    private List<BookMark> bookmarks;
 
     private static final int FONT_STEP = 2;
 
@@ -125,7 +109,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     String mPageLines = "";
     boolean isSpeeking = false;
     TTSControler ttsControler;
-
+    PageAutoFlipinger mPageFlipinger = new PageAutoFlipinger();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,46 +141,18 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
         //page view
         //mPageWidget = new PageWidget(this, width, height);
-        // 当前页
-        //mCurPageBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        // 下一页
-        //mNextPageBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        // 画布
-        //mCurPageCanvas = new Canvas(mCurPageBitmap);
-        //mNextPageCanvas = new Canvas(mNextPageBitmap);
 
         setContentView(R.layout.read);
-
-        // 初始化语音合成对象
-        //mKqwSpeechCompound = new KqwSpeechCompound(this);
-        //mKqwSpeechCompound.setTtsListener(mTtsListener);
 
         RelativeLayout rlayout = (RelativeLayout) findViewById(R.id.readlayout);
         topBar = findViewById(R.id.top_bar);
         //rlayout.addView(mPageWidget);
-        // 工厂
-        //pagefactory = new BookPageFactory(this, width, height);
 
         BookFile bookFile = (BookFile) getIntent().getExtras().getSerializable("path");
         filepath = bookFile.name;
 
         initTopBar();
 
-
-
-        /*try {
-            if (bookFile.flag.equals("1")) {
-                pagefactory.openbook(bookFile.path, begin);
-            } else {
-                pagefactory.openbook(filecatchpath + "catch.txt", begin);
-            }
-            log("book opened :" + bookFile.name);
-            pagefactory.setM_fontSize(mCurrentFontSize);
-            pagefactory.onDraw(mCurPageCanvas);
-        } catch (IOException e1) {
-            e1.printStackTrace();
-            Toast.makeText(this, "no find file", Toast.LENGTH_SHORT).show();
-        }*/
         prev = (Button) findViewById(R.id.prev);
         next = (Button) findViewById(R.id.next);
         prev.setOnClickListener(new OnClickListener() {
@@ -205,6 +161,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 log("prev  clicked");
                 //toPrePage();
                 showPrevPage();
+                speekOrNot();
             }
         });
         next.setOnClickListener(new OnClickListener() {
@@ -212,14 +169,14 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             public void onClick(View v) {
                 log("next  clicked");
                 //toNextPage();
+
                 showNextPage();
+                speekOrNot();
             }
         });
         book_image = (ImageView) findViewById(R.id.book_view);
 
-
         /*mPageWidget.setBitmaps(mCurPageBitmap, mCurPageBitmap);
-
         mPageWidget.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent e) {
@@ -240,8 +197,6 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 return false;
             }
         });*/
-
-        //mCurrentFontSize = pagefactory.getM_fontSize();
 
         setPop();
 
@@ -285,11 +240,25 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         //为了拿到中间对象
         bindService(intent, TTSConn, BIND_AUTO_CREATE);
 
-
-
     }
 
+    class PageAutoFlipinger implements PageFlipingControler{
+        @Override
+        public void showNextPage() {
+            if(isSpeeking){
+                MainActivity.this.showCurrPage();
+            }else{
+                MainActivity.this.showNextPage();
+            }
 
+        }
+
+        @Override
+        public void showPrevPage() {
+            MainActivity.this.showPrevPage();
+        }
+
+    }
 
     //TTS service
     private ServiceConnection TTSConn = new ServiceConnection() {
@@ -297,6 +266,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             ttsControler = (TTSControler) service;
             setReadBg();
+            ttsControler.setPageFlipinger(mPageFlipinger);
             book_image.setImageBitmap(ttsControler.getCurrentPageBitmap()/*mCurPageBitmap*/);
         }
         @Override
@@ -314,43 +284,6 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
     }
 
-/*    public void toPrePage() {
-        // TODO Auto-generated method stub
-        try {
-            pagefactory.prePage();
-            begin = pagefactory.getM_mbBufBegin();// 获取当前阅读位置
-            word = pagefactory.getFirstLineText();// 获取当前阅读位置的首行文字
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        if (pagefactory.isfirstPage()) {
-            Toast.makeText(mContext, "当前是第一页", Toast.LENGTH_SHORT).show();
-        }
-        pagefactory.onDraw(mNextPageCanvas);
-        //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
-        book_image.setImageBitmap(mNextPageBitmap);
-        SharedPreferencesUtils.setParam(this,filepath + "begin", begin);
-    }
-
-
-    public void toNextPage() {
-        // TODO Auto-generated method stub
-        try {
-            pagefactory.nextPage();
-            begin = pagefactory.getM_mbBufBegin();// 获取当前阅读位置
-            word = pagefactory.getFirstLineText();// 获取当前阅读位置的首行文字
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        if (pagefactory.islastPage()) {
-            Toast.makeText(mContext, "已经是最后一页了", Toast.LENGTH_SHORT).show();
-        }
-        pagefactory.onDraw(mNextPageCanvas);
-        //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
-        book_image.setImageBitmap(mNextPageBitmap);
-        SharedPreferencesUtils.setParam(this,filepath + "begin", begin);
-    }*/
-
     public void showPrevPage(){
         book_image.setImageBitmap(ttsControler.toPrevPage());
     }
@@ -359,6 +292,9 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         book_image.setImageBitmap(ttsControler.toNextPage());
     }
 
+    public void showCurrPage(){
+        book_image.setImageBitmap(ttsControler.getCurrentPageBitmap());
+    }
 
     /**
      * 初始化所有POPUPWINDOW
@@ -471,33 +407,11 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         btnSpeek.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*String line =pagefactory.getFirstLineText();
-                if(pagefactory != null && line != null && line != ""){
-                    mKqwSpeechCompound.speaking(line);
-                }*/
-                //11111111
-                /*if(!mKqwSpeechCompound.isSpeaking()) {
-                    curPageLines = pagefactory.getCurrentPageLines();
-                    String page = "";
-                    for (String line : curPageLines) {
-                        page = page + line;
-                    }
-                    log(page);
-                    btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.pause_ic,0,0);
-                    mPageLines = page;
-                    mKqwSpeechCompound.speaking(page);
-                    isSpeeking = true;
-                    log("speek");
-                }else{
-                    mKqwSpeechCompound.stopSpeaking();
-                    isSpeeking = false;
-                    btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.play_ic,0,0);
-                }*/
 
                 if(!ttsControler.isSpeeking()){
 
                     ttsControler.startSpeeking();
-
+                    btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.pause_ic,0,0);
                     isSpeeking = true;
                 }else{
                     ttsControler.stopSpeeking();
@@ -527,7 +441,6 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 }
                 setReadBg();
 
-                //pagefactory.onDraw(mCurPageCanvas);
                 book_image.setImageBitmap(ttsControler.getCurrentPageBitmap());
                 /*mPageWidget.abortAnimation();
                 pagefactory.onDraw(mCurPageCanvas);
@@ -538,81 +451,11 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         });
     }
 
-
-    /**
-     * 合成回调监听。
-     */
-/*    private SynthesizerListener mTtsListener = new SynthesizerListener() {
-        @Override
-        public void onSpeakBegin() {
-            Log.i("txt", "onSpeakBegin");
-        }
-
-        @Override
-        public void onSpeakPaused() {
-            Log.i("txt", "onSpeakPaused");
-        }
-
-        @Override
-        public void onSpeakResumed() {
-            Log.i("txt", "onSpeakResumed");
-        }
-
-        @Override
-        public void onBufferProgress(int percent, int beginPos, int endPos, String info) {
-            // TODO 缓冲的进度
-            Log.i("txt", "onBufferProgress : " + percent);
-        }
-
-        @Override
-        public void onSpeakProgress(int percent, int beginPos, int endPos) {
-            // TODO 说话的进度
-            Log.i("txt", "onSpeakProgress : " + percent);
-        }
-
-        @Override
-        public void onCompleted(SpeechError error) {
-            if (error == null) {
-                Log.i("txt", "onCompleted  toNextPage");
-
-                toNextPage();
-                String page = "";
-                curPageLines = pagefactory.getCurrentPageLines();
-                for(String line:curPageLines){
-                    page = page + line;
-                }
-                log(page);
-                mPageLines = page;
-                if(page != null && !page.equals("")) {
-                    log("speeking continue");
-                    //mKqwSpeechCompound.speaking(page);
-                    ttsControler.startSpeeking(mPageLines);
-                }
-
-            } else if (error != null) {
-                Log.i("txt", error.getPlainDescription(true));
-            }
-
-        }
-
-        @Override
-        public void onEvent(int eventType, int arg1, int arg2, Bundle obj) {
-
-        }
-    };*/
-
     @Override
     protected void onStop() {
         super.onStop();
         log("Main onStop");
-        //111111111
-        /*if(mKqwSpeechCompound.isSpeaking()){
-            mKqwSpeechCompound.stopSpeaking();
-        }*/
-        /*if(ttsControler.isSpeeking()){
-            ttsControler.stopSpeeking();
-        }*/
-        unbindService(TTSConn);
+        //unbindService(TTSConn);
         log("onStop %%%%%%%%%%%%%%%%%%%%");
         saveSp();
     }
@@ -620,10 +463,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //mgr.closeDB();
-        //unbindService(TTSConn);
         log("onDestroy %%%%%%%%%%%%%%%%%%%%");
-        //saveSp();
     }
 
     @Override
@@ -634,17 +474,6 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 finish();
                 break;
             case R.id.ib_add_mark_top:
-                /*BookMark mark = new BookMark();
-                mark.name = filepath;
-                mark.begin = begin;
-                mark.time = getStringCurrentDate();
-                if (word.trim().equals("")) {
-                    mark.word = pagefactory.getSecLineText().trim();
-                } else {
-                    mark.word = word.trim();
-                }
-                mark.word += "\n" + mark.time;
-                mgr.addMarks(mark);*/
                 ttsControler.addBookMard();
                 Toast.makeText(getApplication(), "书签添加成功", Toast.LENGTH_SHORT).show();
                 break;
@@ -671,20 +500,16 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 setToolPop(a);
                 break;
             case R.id.iv_font_discre:
-                /*mCurrentFontSize -= FONT_STEP;
-                pagefactory.setTextSize(mCurrentFontSize);
-                pagefactory.onDraw(mCurPageCanvas);
-                pagefactory.onDraw(mNextPageCanvas);*/
                 //mPageWidget.invalidate();
+                ttsControler.fontDiscre();
+                speekOrNot();
                 book_image.setImageBitmap(ttsControler.getCurrentPageBitmap()/*mCurPageBitmap*/);
                 break;
 
             case R.id.iv_font_incre:
-                /*mCurrentFontSize += FONT_STEP;
-                pagefactory.setTextSize(mCurrentFontSize);
-                pagefactory.onDraw(mCurPageCanvas);
-                pagefactory.onDraw(mNextPageCanvas);*/
                 //mPageWidget.invalidate();
+                ttsControler.fontIncre();
+                speekOrNot();
                 book_image.setImageBitmap(ttsControler.getCurrentPageBitmap()/*mCurPageBitmap*/);
                 break;
 
@@ -722,29 +547,24 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 break;
             case SETTING_CODE:
                 log("from tts setting");
-                //111111111
-                /*if(isSpeeking) {
-                    mKqwSpeechCompound.stopSpeaking();
-                    mKqwSpeechCompound.speaking(mPageLines);
-                }*/
 
                 if (data != null) {
                     boolean settingChanged = data.getExtras().getBoolean(SETTING_KEY);
-                    if(settingChanged && ttsControler.isSpeeking()){
-                        ttsControler.stopSpeeking();
-                        ttsControler.startSpeeking();
+                    if(settingChanged){
+                        speekOrNot();
                     }
                 }
 
                 break;
         }
     }
-/*
-    public static String getStringCurrentDate() {
-        Date currentTime = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return formatter.format(currentTime);
-    }*/
+
+    void speekOrNot(){
+        if(isSpeeking){
+            ttsControler.stopSpeeking();
+            ttsControler.startSpeeking();
+        }
+    }
 
     /**
      * 设置popupwindow的显示与隐藏
@@ -791,7 +611,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             seekBar4 = (SeekBar) toolpop4.findViewById(R.id.seekBar4);
             markEdit4 = (TextView) toolpop4.findViewById(R.id.markEdit4);
             // jumpPage = sp.getInt(bookPath + "jumpPage", 1);
-            float fPercent = (float) (ttsControler.getBegin() * 1.0 / pagefactory.getM_mbBufLen());
+            float fPercent = ttsControler.getCurrPercent();
             DecimalFormat df = new DecimalFormat("#0");
             String strPercent = df.format(fPercent * 100) + "%";
             markEdit4.setText(strPercent);
@@ -828,52 +648,17 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 light = tmpInt;
                 break;
             case R.id.seekBar4:
-                /*markEdit4.setText("" + seekBar4.getProgress() + "%");
+                markEdit4.setText("" + seekBar4.getProgress() + "%");
+                ttsControler.setCurrPercent(seekBar4.getProgress());
 
-                begin = pagefactory.getM_mbBufLen() * seekBar4.getProgress() / 100;
-                if (begin > 0) {
-                    try {
-                        pagefactory.nextPage();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    pagefactory.setM_mbBufEnd(begin);
-                    pagefactory.setM_mbBufBegin(begin);
-                    pagefactory.onDraw(mNextPageCanvas);
-                    //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
-                    //mPageWidget.invalidate();
-                    //postInvalidateUI();
-                    book_image.setImageBitmap(mNextPageBitmap);
-                    postInvalidateUI();
-                }*/
+                book_image.setImageBitmap(ttsControler.getCurrentPageBitmap());
+                speekOrNot();
                 break;
             default:
                 break;
         }
 
     }
-
-    /**
-     * 刷新界面
-     */
-/*    public void postInvalidateUI() {
-        //mPageWidget.abortAnimation();
-        pagefactory.onDraw(mCurPageCanvas);
-        try {
-            pagefactory.currentPage();
-            begin = pagefactory.getM_mbBufBegin();// 获取当前阅读位置
-            word = pagefactory.getFirstLineText();// 获取当前阅读位置的首行文字
-        } catch (IOException e1) {
-        }
-
-        pagefactory.onDraw(mNextPageCanvas);
-
-        //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
-        //mPageWidget.postInvalidate();
-        book_image.setImageBitmap(mNextPageBitmap);
-    }*/
-
-
 
     private void saveSp() {
 
@@ -893,12 +678,6 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     }
 
     private void setReadBg() {
-        /*pagefactory.setTextColor(isNight);
-        if (isNight) {
-            pagefactory.setBgBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.bg_book_night));
-        } else {
-            pagefactory.setBgBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.bg_book_day));
-        }*/
         ttsControler.setPageBG(isNight);
     }
 }
