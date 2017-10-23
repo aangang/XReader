@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,8 +19,9 @@ public class TimerSettingActivity extends Activity {
 
 	TextView timer_desc;
 	ListView timer_list;
+	Button cancel_btn;
 	private String[] mListStr = {"5分钟","10分钟","15分钟","30分钟","1小时","1.5小时","2小时"};
-	int timer_setting = 0;
+	int timer_setting = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -40,6 +42,21 @@ public class TimerSettingActivity extends Activity {
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 				Toast.makeText(TimerSettingActivity.this,"您选择了" + mListStr[position], Toast.LENGTH_LONG).show();
 				timer_setting = position;
+				Intent intent = new Intent();
+				intent.putExtra(MainActivity.TIMER_KEY, timer_setting);
+				setResult(MainActivity.TIMER_CODE, intent);
+				finish();
+			}
+		});
+		cancel_btn = (Button)findViewById(R.id.cancel_btn);
+		cancel_btn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Toast.makeText(TimerSettingActivity.this,"您取消了定时", Toast.LENGTH_LONG).show();
+				Intent intent = new Intent();
+				intent.putExtra(MainActivity.TIMER_KEY, -1);
+				setResult(MainActivity.TIMER_CODE, intent);
+				finish();
 			}
 		});
 	}
@@ -48,7 +65,7 @@ public class TimerSettingActivity extends Activity {
 	public void onBackPressed() {
 			//super.onBackPressed();
 			Intent intent = new Intent();
-			intent.putExtra(MainActivity.TIMER_KEY, timer_setting);
+			//intent.putExtra(MainActivity.TIMER_KEY, timer_setting);
 			setResult(MainActivity.TIMER_CODE, intent);
 			finish();
 	}

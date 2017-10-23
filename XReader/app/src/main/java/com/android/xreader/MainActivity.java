@@ -9,6 +9,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -42,6 +43,7 @@ import com.android.xreader.tts.TtsSettings;
 import com.android.xreader.utils.FusionField;
 import com.android.xreader.utils.SharedPreferencesUtils;
 import com.android.xreader.utils.Tools;
+import com.android.xreader.views.CircleProgressbar;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SynthesizerListener;
 
@@ -84,6 +86,10 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     private PopupWindow mPopupWindow, mToolpop, mToolpop1, mToolpop2, mToolpop4;
 
     private View popupwindwow, toolpop, toolpop1, toolpop2, toolpop4, topBar;
+
+    private View countDown;
+    private PopupWindow mCountDownWindow;
+    private CircleProgressbar mCircleTimer;
 
     private SeekBar seekBar1, seekBar2, seekBar4;
 
@@ -314,6 +320,10 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         mToolpop2 = new PopupWindow(toolpop2, ViewGroup.LayoutParams.MATCH_PARENT, subPopUpWindowHeigt);
         toolpop4 = this.getLayoutInflater().inflate(R.layout.tool44, null);// 进度
         mToolpop4 = new PopupWindow(toolpop4, ViewGroup.LayoutParams.MATCH_PARENT, subPopUpWindowHeigt);
+
+        countDown = this.getLayoutInflater().inflate(R.layout.timer_pop,null);
+        mCountDownWindow = new PopupWindow(countDown, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
     }
 
     @Override
@@ -354,6 +364,22 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
         //mPopupWindow.showAtLocation(mPageWidget, Gravity.BOTTOM, 0, 0);
         mPopupWindow.showAtLocation((RelativeLayout) findViewById(R.id.readlayout), Gravity.BOTTOM, 0, 0);
+    }
+
+    private  void showTimerPop(){
+        mCircleTimer = (CircleProgressbar) countDown.findViewById(R.id.timer_pop);
+        mCircleTimer.setOutLineColor(Color.TRANSPARENT);
+        mCircleTimer.setInCircleColor(Color.parseColor("#33000101"));
+        mCircleTimer.setProgressColor(Color.parseColor("#331BB079"));
+        mCircleTimer.setProgressLineWidth(8);
+        mCircleTimer.setProgressType(CircleProgressbar.ProgressType.COUNT);
+        mCircleTimer.setTimeMillis(3000);
+        mCircleTimer.reStart();
+        mCountDownWindow.showAtLocation((RelativeLayout) findViewById(R.id.readlayout), Gravity.CENTER_VERTICAL|Gravity.END, 0, 0);
+    }
+
+    private void hideTimerPop(){
+        mCountDownWindow.dismiss();
     }
 
     private void setMainMenuVisibility(boolean show) {
@@ -572,6 +598,11 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 log("from tts timer");
                 if (data != null) {
                     int timerSetting = data.getExtras().getInt(TIMER_KEY);
+                    if(timerSetting >= 0){
+                        showTimerPop();
+                    }else if(timerSetting == -1){
+                        hideTimerPop();
+                    }
 
                 }
                 break;

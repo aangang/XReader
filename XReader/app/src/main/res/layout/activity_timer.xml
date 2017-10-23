@@ -16,12 +16,19 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="18dp"
         android:text="定时未开启" />
+    <Button
+        android:id="@+id/cancel_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/timer_desc"
+        android:layout_marginBottom="18dp"
+        android:text="停止定时" />
 
     <ListView
         android:id="@+id/timer_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/timer_desc"
+        android:layout_below="@id/cancel_btn"
         >
 
     </ListView>

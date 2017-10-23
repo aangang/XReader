@@ -268,7 +268,8 @@ public class CircleProgressbar extends TextView {
 
         //画字
         Paint paint = getPaint();
-        paint.setColor(getCurrentTextColor());
+        //paint.setColor(getCurrentTextColor());
+        paint.setColor(Color.GREEN);
         paint.setAntiAlias(true);
         paint.setTextAlign(Paint.Align.CENTER);
         float textY = bounds.centerY() - (paint.descent() + paint.ascent()) / 2;

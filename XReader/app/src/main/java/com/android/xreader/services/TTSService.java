@@ -64,6 +64,8 @@ public class TTSService extends Service {
 
     PageFlipingControler mPageFlipinger;
 
+    private int mTtsTimerLeft = 0;
+
 
     public TTSService() {
 
@@ -316,6 +318,16 @@ public class TTSService extends Service {
         @Override
         public void setPageFlipinger(PageFlipingControler pageFlipinger) {
             TTSService.this.mPageFlipinger = pageFlipinger;
+        }
+
+        @Override
+        public void setTTSTimer(int seconds) {
+            mTtsTimerLeft = seconds;
+        }
+
+        @Override
+        public int getTTSTimer() {
+            return  10;//mTtsTimerLeft;
         }
     }
 

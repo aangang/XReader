@@ -30,4 +30,7 @@ public interface TTSControler {
     float getCurrPercent();
     void setCurrPercent(int progress);
 
+    void setTTSTimer(int seconds);
+    int getTTSTimer();
+
 }
