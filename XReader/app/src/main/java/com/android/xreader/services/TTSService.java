@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -65,7 +66,7 @@ public class TTSService extends Service {
     PageFlipingControler mPageFlipinger;
 
     private int mTtsTimerLeft = 0;
-
+    CountDownTimer mCountDown;
 
     public TTSService() {
 
@@ -323,11 +324,29 @@ public class TTSService extends Service {
         @Override
         public void setTTSTimer(int seconds) {
             mTtsTimerLeft = seconds;
+
+            if(mCountDown != null){
+                mCountDown.cancel();
+            }
+            mCountDown = new CountDownTimer(seconds * 1000, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    mTtsTimerLeft = mTtsTimerLeft -1;
+                }
+                @Override
+                public void onFinish() {
+                    mTtsTimerLeft = 0;
+                    if(isSpeeking()){
+                        stopSpeeking();
+                    }
+                }
+            };
+            mCountDown.start();
         }
 
         @Override
         public int getTTSTimer() {
-            return  10;//mTtsTimerLeft;
+            return  mTtsTimerLeft;
         }
     }
 

@@ -20,8 +20,10 @@ public class TimerSettingActivity extends Activity {
 	TextView timer_desc;
 	ListView timer_list;
 	Button cancel_btn;
-	private String[] mListStr = {"5分钟","10分钟","15分钟","30分钟","1小时","1.5小时","2小时"};
+	private String[] mListStr = {"1分钟","5分钟","10分钟","15分钟","30分钟","1小时","1.5小时","2小时"};
+	private int[] times = {1,5,10,15,30,60,90,120};
 	int timer_setting = -1;
+	int timer_minute = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -42,8 +44,9 @@ public class TimerSettingActivity extends Activity {
 			public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 				Toast.makeText(TimerSettingActivity.this,"您选择了" + mListStr[position], Toast.LENGTH_LONG).show();
 				timer_setting = position;
+				timer_minute = times[timer_setting];
 				Intent intent = new Intent();
-				intent.putExtra(MainActivity.TIMER_KEY, timer_setting);
+				intent.putExtra(MainActivity.TIMER_KEY, timer_minute);
 				setResult(MainActivity.TIMER_CODE, intent);
 				finish();
 			}
@@ -54,7 +57,7 @@ public class TimerSettingActivity extends Activity {
 			public void onClick(View view) {
 				Toast.makeText(TimerSettingActivity.this,"您取消了定时", Toast.LENGTH_LONG).show();
 				Intent intent = new Intent();
-				intent.putExtra(MainActivity.TIMER_KEY, -1);
+				intent.putExtra(MainActivity.TIMER_KEY, 0);
 				setResult(MainActivity.TIMER_CODE, intent);
 				finish();
 			}
@@ -65,7 +68,7 @@ public class TimerSettingActivity extends Activity {
 	public void onBackPressed() {
 			//super.onBackPressed();
 			Intent intent = new Intent();
-			//intent.putExtra(MainActivity.TIMER_KEY, timer_setting);
+			//intent.putExtra(MainActivity.TIMER_KEY, timer_minute);
 			setResult(MainActivity.TIMER_CODE, intent);
 			finish();
 	}

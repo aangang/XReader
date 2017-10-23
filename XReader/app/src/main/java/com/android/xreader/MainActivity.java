@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -44,6 +45,7 @@ import com.android.xreader.utils.FusionField;
 import com.android.xreader.utils.SharedPreferencesUtils;
 import com.android.xreader.utils.Tools;
 import com.android.xreader.views.CircleProgressbar;
+import com.android.xreader.views.CountDownView;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SynthesizerListener;
 
@@ -89,7 +91,9 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 
     private View countDown;
     private PopupWindow mCountDownWindow;
-    private CircleProgressbar mCircleTimer;
+    private CountDownView mCircleTimer;
+
+    TextView btnSpeek;
 
     private SeekBar seekBar1, seekBar2, seekBar4;
 
@@ -111,14 +115,10 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     ImageView book_image;
     Button prev,next;
 
-    //tts
-    private KqwSpeechCompound mKqwSpeechCompound;
-    Vector<String> curPageLines;
-
-    String mPageLines = "";
     boolean isSpeeking = false;
     TTSControler ttsControler;
     PageAutoFlipinger mPageFlipinger = new PageAutoFlipinger();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -366,16 +366,21 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         mPopupWindow.showAtLocation((RelativeLayout) findViewById(R.id.readlayout), Gravity.BOTTOM, 0, 0);
     }
 
-    private  void showTimerPop(){
-        mCircleTimer = (CircleProgressbar) countDown.findViewById(R.id.timer_pop);
-        mCircleTimer.setOutLineColor(Color.TRANSPARENT);
-        mCircleTimer.setInCircleColor(Color.parseColor("#33000101"));
-        mCircleTimer.setProgressColor(Color.parseColor("#331BB079"));
-        mCircleTimer.setProgressLineWidth(8);
-        mCircleTimer.setProgressType(CircleProgressbar.ProgressType.COUNT);
-        mCircleTimer.setTimeMillis(3000);
-        mCircleTimer.reStart();
+    private  void showTimerPop(int timerMinute){
+        mCircleTimer = (CountDownView) countDown.findViewById(R.id.timer_pop);
+        mCircleTimer.setCountdownTime(timerMinute);
+        mCircleTimer.setAddCountDownListener(new CountDownView.OnCountDownFinishListener() {
+            @Override
+            public void countDownFinished() {
+                Toast.makeText(MainActivity.this, "倒计时结束", Toast.LENGTH_SHORT).show();
+                if(btnSpeek != null){
+                    btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.play_ic,0,0);
+                }
+                hideTimerPop();
+            }
+        });
         mCountDownWindow.showAtLocation((RelativeLayout) findViewById(R.id.readlayout), Gravity.CENTER_VERTICAL|Gravity.END, 0, 0);
+        mCircleTimer.startCountDown();
     }
 
     private void hideTimerPop(){
@@ -419,7 +424,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         TextView btnProgress = (TextView) popupwindwow.findViewById(R.id.btn_progress);
         TextView btnTextSize = (TextView) popupwindwow.findViewById(R.id.btn_text_size);
         TextView btnBrightness = (TextView) popupwindwow.findViewById(R.id.btn_brightness);
-        final TextView btnSpeek = (TextView) popupwindwow.findViewById(R.id.btn_speek);
+        btnSpeek = (TextView) popupwindwow.findViewById(R.id.btn_speek);
         TextView btnSetting = (TextView) popupwindwow.findViewById(R.id.btn_setting);
         TextView btnTimer = (TextView) popupwindwow.findViewById(R.id.btn_timer);
         final TextView btnNight = (TextView) popupwindwow.findViewById(R.id.btn_night);
@@ -597,11 +602,23 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             case TIMER_CODE:
                 log("from tts timer");
                 if (data != null) {
-                    int timerSetting = data.getExtras().getInt(TIMER_KEY);
-                    if(timerSetting >= 0){
-                        showTimerPop();
-                    }else if(timerSetting == -1){
+                    int timerMinute = data.getExtras().getInt(TIMER_KEY);
+                    //set tts time secconds
+                    ttsControler.setTTSTimer(timerMinute * 60);
+                    if(timerMinute > 0){
+                        showTimerPop(timerMinute);
+                        if(!ttsControler.isSpeeking()){
+                            ttsControler.startSpeeking();
+                            btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.pause_ic,0,0);
+                            isSpeeking = true;
+                        }
+                    }else if(timerMinute == 0){
                         hideTimerPop();
+                        if(ttsControler.isSpeeking()){
+                            ttsControler.stopSpeeking();
+                            btnSpeek.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.play_ic,0,0);
+                            isSpeeking = false;
+                        }
                     }
 
                 }
