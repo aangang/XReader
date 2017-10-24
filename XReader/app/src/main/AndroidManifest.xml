@@ -65,6 +65,11 @@
             android:name=".TimerSettingActivity"
             android:screenOrientation="portrait" />
 
+        <activity android:name=".localfile.FileSearcherActivity"
+            android:theme="@style/FileSearcherActivityTheme"/>
+        <activity
+            android:name=".SearchActivity"
+            android:screenOrientation="portrait" />
         <service
             android:name=".services.TTSService"
             android:enabled="true"

@@ -86,6 +86,8 @@ public class CountDownView extends View {
         //宽度
         mPaint.setStrokeWidth(mRingWidth);
         canvas.drawArc(mRectF, -90, mCurrentProgress - 360, false, mPaint);
+        mPaint.setColor(0x6600ff00);
+        canvas.drawCircle(mRectF.centerX(),mRectF.centerY(),mRingWidth / 2 - 5,mPaint);
         //绘制文本
         Paint textPaint = new Paint();
         textPaint.setAntiAlias(true);

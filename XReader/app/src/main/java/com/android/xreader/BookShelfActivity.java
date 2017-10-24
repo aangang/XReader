@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -34,6 +35,7 @@ public class BookShelfActivity extends BaseActivity {
     private DBManager mgr;
 
     private List<BookFile> books;
+    Button search;
 
     /**
      * book File cache
@@ -72,6 +74,15 @@ public class BookShelfActivity extends BaseActivity {
 
     private void initView() {
         bookShelf = (GridView) findViewById(R.id.bookShelf);
+        search = (Button)findViewById(R.id.search);
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Tools.log("search clicked");
+                Intent intent = new Intent(BookShelfActivity.this,SearchActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void notifyDataChange() {
