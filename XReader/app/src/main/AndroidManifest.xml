@@ -70,6 +70,9 @@
         <activity
             android:name=".SearchActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".LoadBookActivity"
+            android:screenOrientation="portrait" />
         <service
             android:name=".services.TTSService"
             android:enabled="true"

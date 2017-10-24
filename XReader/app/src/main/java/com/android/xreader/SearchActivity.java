@@ -18,7 +18,10 @@ import java.util.ArrayList;
  */
 
 public class SearchActivity extends AppCompatActivity {
-    private static final int REQUEST_CODE = 888;
+    private static final int SEARCH_CODE = 111;
+    private static final int LOADBOOK_CODE = 222;
+
+    Button search_btn,byhand_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +29,8 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
         final EditText editText = (EditText) findViewById(R.id.example_edit);
-        Button button = (Button) findViewById(R.id.example_confirm);
-        button.setOnClickListener(new View.OnClickListener() {
+        search_btn = (Button) findViewById(R.id.search_btn);
+        search_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String content = editText.getText().toString();
@@ -38,8 +41,17 @@ public class SearchActivity extends AppCompatActivity {
                     intent.putExtra("keyword",content);
                     //intent.putExtra("theme",R.style.SearchTheme);
                     intent.putExtra("min",50*1024);
-                    startActivityForResult(intent,REQUEST_CODE);
+                    startActivityForResult(intent,SEARCH_CODE);
                 }
+            }
+        });
+
+        byhand_btn =  (Button) findViewById(R.id.byhand_btn);
+        byhand_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SearchActivity.this, LoadBookActivity.class);
+                startActivityForResult(intent,LOADBOOK_CODE);
             }
         });
 
@@ -49,10 +61,15 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == REQUEST_CODE && resultCode ==FileSearcherActivity.OK && data != null){
+        if(requestCode == SEARCH_CODE && resultCode ==FileSearcherActivity.OK && data != null){
             ArrayList<File> list = (ArrayList<File>) data.getSerializableExtra("data");
             Toast.makeText(this,"you selected"+list.size()+"items",Toast.LENGTH_SHORT).show();
         }
+
+        if(requestCode == LOADBOOK_CODE && resultCode == LoadBookActivity.OK && data != null){
+            Toast.makeText(this,"book loaded",Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 
