@@ -67,6 +67,10 @@
 
         <activity android:name=".localfile.FileSearcherActivity"
             android:theme="@style/FileSearcherActivityTheme"/>
+
+        <activity android:name=".localfile.FilePickerActivity"
+            android:theme="@style/FileSearcherActivityTheme"/>
+
         <activity
             android:name=".SearchActivity"
             android:screenOrientation="portrait" />

@@ -85,7 +85,7 @@ public class FileSearcherActivity extends AppCompatActivity {
 
     private void showAlertDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.FileSearcherDialogTheme);
-        builder.setMessage(getText(R.string.dialog_message));
+        builder.setMessage(getText(R.string.dialog_message_search));
         builder.setPositiveButton(getText(R.string.confirm), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {

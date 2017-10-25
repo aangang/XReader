@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.xreader.localfile.FilePickerActivity;
 import com.android.xreader.localfile.FileSearcherActivity;
 
 import java.io.File;
@@ -50,7 +51,11 @@ public class SearchActivity extends AppCompatActivity {
         byhand_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(SearchActivity.this, LoadBookActivity.class);
+                String content = editText.getText().toString();
+                Intent intent = new Intent(SearchActivity.this, FilePickerActivity.class);
+                intent.putExtra("keyword",content);
+                //intent.putExtra("theme",R.style.SearchTheme);
+                intent.putExtra("min",50*1024);
                 startActivityForResult(intent,LOADBOOK_CODE);
             }
         });
