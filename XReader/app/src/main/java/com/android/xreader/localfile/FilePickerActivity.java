@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.android.xreader.R;
+import com.android.xreader.utils.Tools;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class FilePickerActivity extends AppCompatActivity {
     public static final int OK = 0;
     public static final int NO_DATA_SELECTED = 1;
     FilePickAdapter mAdapter;
-
+    TextView title;
     @Override
     protected void onCreate( Bundle savedInstanceState) {
         Intent intent = getIntent();
@@ -41,10 +42,12 @@ public class FilePickerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_picker_main);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.file_picker_main_recycler_view);
-        TextView text = (TextView) findViewById(R.id.file_picker_main_text);
-        mAdapter = new FilePickAdapter(this,text);
+        title = (TextView) findViewById(R.id.file_picker_main_text);
+        mAdapter = new FilePickAdapter(this);
         recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mAdapter.setDirChangeCallback(new PickDictChangeCallback());
+        //必须在setDirChangeCallback后执行startPick
         mAdapter.startPick(Environment.getExternalStorageDirectory());
         Toolbar toolbar = (Toolbar) findViewById(R.id.file_picker_main_toolbar);
         toolbar.setTitle("");
@@ -56,11 +59,33 @@ public class FilePickerActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
+    }
+
+    class PickDictChangeCallback implements FilePickAdapter.DictChangeCallback{
+        @Override
+        public void onDictChange(File curDir) {
+            title.setText("当前目录:" + curDir.getName());
+        }
     }
 
     @Override
     public void onBackPressed() {
-        showAlertDialog();
+        try{
+            if(mAdapter != null) {
+                if (mAdapter.getmCurrentDir().getCanonicalPath().equals("/storage/emulated/0")){
+                    Tools.log("root dir,return");
+                    //super.onBackPressed();
+                    showAlertDialog();
+                }else if(mAdapter.getmCurrentDir().getCanonicalPath() != null && !mAdapter.getmCurrentDir().getCanonicalPath().equals("")){
+                    File father = mAdapter.getmCurrentDir().getParentFile();
+                    mAdapter.startPick(father);
+                }
+            }
+        }catch (Exception e){
+        }
+
+
     }
 
     private void showAlertDialog(){

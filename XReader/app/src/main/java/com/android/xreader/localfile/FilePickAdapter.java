@@ -8,9 +8,11 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.xreader.R;
+import com.android.xreader.utils.Tools;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,19 +31,33 @@ public class FilePickAdapter extends RecyclerView.Adapter<FilePickAdapter.FSView
     private int colorAccent;
     private File mCurrentDir;
 
-    FilePickAdapter(final Context context, final TextView textView){
+    DictChangeCallback mCallback;
+
+
+    FilePickAdapter(final Context context){
         this.context = context;
         colorAccent = fetchAccentColor();
     }
 
     public void startPick(File dir){
         mCurrentDir = dir;
+        try {
+            Tools.log(mCurrentDir.getCanonicalPath());
+        }catch (Exception e){
+
+        }
+        mCallback.onDictChange(mCurrentDir);
         resultList = getChildDirs(mCurrentDir);
         notifyDataSetChanged();
     }
 
+    public File getmCurrentDir(){
+        return mCurrentDir;
+    }
+
     public List<FileDetail> getChildDirs(File dir){
         List<FileDetail> tmpList = new ArrayList<>();
+        checkStatusMap.clear();
         for(File file: dir.listFiles()){
             final FileDetail detail = new FileDetail(file);
             tmpList.add(detail);
@@ -70,6 +86,14 @@ public class FilePickAdapter extends RecyclerView.Adapter<FilePickAdapter.FSView
         holder.size.setText(context.getString(R.string.file_size)+file.getSize());
         holder.time.setText(context.getString(R.string.file_last_modified_time)+file.getLastModifiedTime());
         CardView cardView = (CardView) holder.itemView;
+
+        if(file.getFile().isDirectory()){
+            holder.type.setImageResource(R.drawable.icon_dict);
+        }
+        if(!file.getFile().isDirectory()){
+            holder.type.setImageResource(R.drawable.icon_file);
+        }
+
         if(checkStatusMap.get(position)){
             cardView.setCardBackgroundColor(colorAccent);
         }else{
@@ -79,17 +103,25 @@ public class FilePickAdapter extends RecyclerView.Adapter<FilePickAdapter.FSView
 
     class FSViewHolder extends RecyclerView.ViewHolder{
         TextView title,location,size,time;
+        ImageView type;
         FSViewHolder(View view){
             super(view);
             title = (TextView) view.findViewById(R.id.file_searcher_item_title);
             location = (TextView) view.findViewById(R.id.file_searcher_item_location);
             size = (TextView) view.findViewById(R.id.file_searcher_item_size);
             time = (TextView) view.findViewById(R.id.file_searcher_item_create_time);
+            type = (ImageView)view.findViewById(R.id.type);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    checkStatusMap.set(getAdapterPosition(),!checkStatusMap.get(getAdapterPosition()));
-                    notifyDataSetChanged();
+                    FileDetail file = resultList.get(getAdapterPosition());
+                    if(file.getFile().isDirectory()){
+                        startPick(file.getFile());
+                        mCallback.onDictChange(file.getFile());
+                    }else {
+                        checkStatusMap.set(getAdapterPosition(), !checkStatusMap.get(getAdapterPosition()));
+                        notifyDataSetChanged();
+                    }
                 }
             });
         }
@@ -137,6 +169,12 @@ public class FilePickAdapter extends RecyclerView.Adapter<FilePickAdapter.FSView
         return color;
     }
 
+    public void setDirChangeCallback(DictChangeCallback callback){
+        mCallback = callback;
+    }
 
+    public interface DictChangeCallback{
+        void onDictChange(File curDir);
+    }
 
 }

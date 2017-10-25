@@ -8,13 +8,13 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="24dp"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/black"/>
     <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:id="@+id/file_searcher_main_toolbar"
         app:contentInsetStart="0dp"
-        android:background="@android:color/darker_gray">
+        android:background="@android:color/black">
         <TextView
             android:id="@+id/file_searcher_main_text"
             android:layout_width="wrap_content"

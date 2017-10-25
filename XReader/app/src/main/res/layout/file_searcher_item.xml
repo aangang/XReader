@@ -12,10 +12,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/header"
-            android:visibility="gone"/>
+            android:id="@+id/type"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/icon_file"
+            android:layout_marginRight="8dp"
+            android:layout_gravity="center_vertical"
+            android:visibility="visible"/>
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"

@@ -62,7 +62,7 @@
     <string name="cancel">取消</string>
     <string name="confirm">确定</string>
     <string name="dialog_message_search">放弃搜索？</string>
-    <string name="dialog_message_pick">放弃选择？</string>
+    <string name="dialog_message_pick">已到根目录，退出文件选择？</string>
     <string name="no_result">未发现符合条件的文件</string>
     <string name="file_last_modified_time">修改时间：</string>
     <string name="file_name">文件名：</string>
