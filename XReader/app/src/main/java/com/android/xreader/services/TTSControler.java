@@ -23,6 +23,7 @@ public interface TTSControler {
     void fontDiscre();
     void fontIncre();
     int getBegin();
+    void setBegin(int begin);
     int getFontSize();
     void setPageBG(boolean isNight);
     void setPageFlipinger(PageFlipingControler pageFlipinger);

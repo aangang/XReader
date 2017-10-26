@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.android.xreader.db.DBManager;
 import com.android.xreader.module.BookMark;
+import com.android.xreader.utils.Tools;
 
 import java.util.List;
 
@@ -51,6 +52,7 @@ public class DirectoryActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent();
+                Tools.log("mark  position:" + position);
                 intent.putExtra(MainActivity.DIR_KEY, bookmarks.get(position).begin);
                 setResult(MainActivity.DIR_CODE, intent);
                 finish();
@@ -69,8 +71,10 @@ public class DirectoryActivity extends Activity {
     }
 
     private void init(String filepath) {
+        Tools.log("book name:" + filepath);
         bookmarks = mgr.queryMarks(filepath);
         if (bookmarks.size() <= 0) {
+            mBookName.setText(filepath);
             mListView.setVisibility(View.GONE);
             mEmptyView.setText("你还没有添加书签");
             mEmptyView.setVisibility(View.VISIBLE);

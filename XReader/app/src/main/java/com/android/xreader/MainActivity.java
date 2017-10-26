@@ -439,6 +439,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             setReadBg();
             ttsControler.setPageFlipinger(mPageFlipinger);
             book_image.setImageBitmap(ttsControler.getCurrentPageBitmap()/*mCurPageBitmap*/);
+
         }
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
@@ -735,21 +736,14 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         switch (requestCode) {
             case DIR_CODE:
                 if (data != null) {
-                    /*int markBegin = data.getExtras().getInt(DIR_KEY);
-                    if (markBegin > 0) {
-                        try {
-                            pagefactory.nextPage();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        pagefactory.setM_mbBufEnd(markBegin);
-                        pagefactory.setM_mbBufBegin(markBegin);
-                        pagefactory.onDraw(mNextPageCanvas);
-                        //mPageWidget.setBitmaps(mCurPageBitmap, mNextPageBitmap);
-                        //mPageWidget.invalidate();
-                        book_image.setImageBitmap(mCurPageBitmap);
-                        postInvalidateUI();
-                    }*/
+                    int markBegin = data.getExtras().getInt(DIR_KEY);
+                    if (markBegin >= 0) {
+                        log("mark begin:" + markBegin);
+                        ttsControler.setBegin(markBegin);
+                        book_image.setImageBitmap(ttsControler.getCurrentPageBitmap());
+
+                        speekOrNot();
+                    }
                 }
                 break;
             case SETTING_CODE:

@@ -302,6 +302,21 @@ public class TTSService extends Service {
         }
 
         @Override
+        public void setBegin(int b) {
+            TTSService.this.begin = b;
+            if (begin > 0) {
+                try {
+                    pagefactory.nextPage();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                pagefactory.setM_mbBufEnd(begin);
+                pagefactory.setM_mbBufBegin(begin);
+                pagefactory.onDraw(mCurPageCanvas);
+            }
+        }
+
+        @Override
         public int getFontSize() {
             return mCurrentFontSize;
         }
