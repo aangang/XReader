@@ -188,6 +188,9 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
             }
         });
 
+        prev.setVisibility(View.INVISIBLE);
+        next.setVisibility(View.INVISIBLE);
+
         mGestureDetector = new GestureDetector(new mGestureListener());
 
         book_image = (ImageView) findViewById(R.id.book_view);
@@ -268,11 +271,13 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     private class mGestureListener implements GestureDetector.OnGestureListener{
 
                         // 用户轻触触摸屏，由1个MotionEvent ACTION_DOWN触发
-                       public boolean onDown(MotionEvent e) {
-                        Log.i("MyGesture", "onDown");
-                        Toast.makeText(MainActivity.this, "onDown", Toast.LENGTH_SHORT).show();
-                        return false;
-                   }
+        //
+          public boolean onDown(MotionEvent e) {
+              Log.i("gesture", "onDown");
+                   //Toast.makeText(MainActivity.this, "onDown", Toast.LENGTH_SHORT).show();
+                   //will not get fling event when return false
+                   return true;
+          }
 
                         /*
 39.         * 用户轻触触摸屏，尚未松开或拖动，由一个1个MotionEvent ACTION_DOWN触发
@@ -283,40 +288,61 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
 44.         * 如果在按下的瞬间没有松开或者是拖动的时候onShowPress就会执行，如果是按下的时间超过瞬间
 45.         * （这块我也不太清楚瞬间的时间差是多少，一般情况下都会执行onShowPress），拖动了，就不执行onShowPress。
 46.         */
-                        public void onShowPress(MotionEvent e) {
+                    public void onShowPress(MotionEvent e) {
                         Log.i("gesture", "onShowPress");
-                        Toast.makeText(MainActivity.this, "onShowPress", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainActivity.this, "onShowPress", Toast.LENGTH_SHORT).show();
                     }
 
                         // 用户（轻触触摸屏后）松开，由一个1个MotionEvent ACTION_UP触发
                         ///轻击一下屏幕，立刻抬起来，才会有这个触发
                         //从名子也可以看出,一次单独的轻击抬起操作,当然,如果除了Down以外还有其它操作,那就不再算是Single操作了,所以这个事件 就不再响应
-                        public boolean onSingleTapUp(MotionEvent e) {
+                    public boolean onSingleTapUp(MotionEvent e) {
                         Log.i("gesture", "onSingleTapUp");
-                        Toast.makeText(MainActivity.this, "onSingleTapUp", Toast.LENGTH_SHORT).show();
+                        if (mIsSubPopUpWindowShowing) {
+                            hideSubMenu();
+                        }
+                        if (mIsMainPopupWindowShowing) {
+                            setMainMenuVisibility(false);
+                        } else {
+                            setMainMenuVisibility(true);
+                        }
                         return true;
                     }
 
-                        // 用户按下触摸屏，并拖动，由1个MotionEvent ACTION_DOWN, 多个ACTION_MOVE触发
-                        public boolean onScroll(MotionEvent e1, MotionEvent e2,
-                                                                   float distanceX, float distanceY) {
-                        Log.i("gesture", "onScroll:"+(e2.getX()-e1.getX()) +"   "+distanceX);
-                        Toast.makeText(MainActivity.this, "onScroll", Toast.LENGTH_LONG).show();
 
-                       return true;
+                        // 用户按下触摸屏，并拖动，由1个MotionEvent ACTION_DOWN, 多个ACTION_MOVE触发
+                    public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                                                                   float distanceX, float distanceY) {
+                        //Log.i("gesture", "onScroll:"+(e2.getX()-e1.getX()) +"   "+distanceX);
+                        // Toast.makeText(MainActivity.this, "onScroll", Toast.LENGTH_LONG).show();
+                         return true;
                     }
 
                         // 用户长按触摸屏，由多个MotionEvent ACTION_DOWN触发
-                        public void onLongPress(MotionEvent e) {
+                    public void onLongPress(MotionEvent e) {
                          Log.i("gesture", "onLongPress");
-                         Toast.makeText(MainActivity.this, "onLongPress", Toast.LENGTH_LONG).show();
+                         //Toast.makeText(MainActivity.this, "onLongPress", Toast.LENGTH_LONG).show();
                     }
 
-                        // 用户按下触摸屏、快速移动后松开，由1个MotionEvent ACTION_DOWN, 多个ACTION_MOVE, 1个ACTION_UP触发
-                        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-                                                                  float velocityY) {
+                    // 用户按下触摸屏、快速移动后松开，由1个MotionEvent ACTION_DOWN, 多个ACTION_MOVE, 1个ACTION_UP触发
+                    public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
                         Log.i("gesture", "onFling");
-                       Toast.makeText(MainActivity.this, "onFling", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(MainActivity.this, "onFling", Toast.LENGTH_LONG).show();
+
+                        if(velocityX>1000){
+                           // Toast.makeText(MainActivity.this, "onFling  velocityX right", Toast.LENGTH_LONG).show();
+                            Log.i("gesture", "onFling right");
+
+                            showPrevPage();
+                            speekOrNot();
+                        }else if(velocityX < -1000){
+                            //Toast.makeText(MainActivity.this, "onFling  velocityX left", Toast.LENGTH_LONG).show();
+                            Log.i("gesture", "onFling left");
+
+                            showNextPage();
+                            speekOrNot();
+                        }
+
                         return true;
                     }
             };
@@ -337,18 +363,10 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                     }
 
                 public boolean onSingleTapUp(MotionEvent e) {
-                        Log.i("gesture", "onSingleTapUp");
-                        Toast.makeText(MainActivity.this, "onSingleTapUp", Toast.LENGTH_SHORT).show();
-                    if (mIsSubPopUpWindowShowing) {
-                        hideSubMenu();
-                    }
-                    if (mIsMainPopupWindowShowing) {
-                        setMainMenuVisibility(false);
-                    } else {
-                        setMainMenuVisibility(true);
-                    }
-                        return true;
-                    }
+                    Log.i("gesture", "onSingleTapUp");
+                    Toast.makeText(MainActivity.this, "onSingleTapUp", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
 
                 public boolean onScroll(MotionEvent e1, MotionEvent e2,
                                float distanceX, float distanceY) {
