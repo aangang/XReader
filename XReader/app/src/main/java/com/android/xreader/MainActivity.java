@@ -16,8 +16,10 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -119,6 +121,8 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
     TTSControler ttsControler;
     PageAutoFlipinger mPageFlipinger = new PageAutoFlipinger();
 
+    private GestureDetector mGestureDetector;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -183,7 +187,16 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 speekOrNot();
             }
         });
+
+        mGestureDetector = new GestureDetector(new mGestureListener());
+
         book_image = (ImageView) findViewById(R.id.book_view);
+        book_image.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return mGestureDetector.onTouchEvent(motionEvent);
+            }
+        });
 
         /*mPageWidget.setBitmaps(mCurPageBitmap, mCurPageBitmap);
         mPageWidget.setOnTouchListener(new View.OnTouchListener() {
@@ -222,7 +235,8 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                 }
             }
         });*/
-        rlayout.setOnClickListener(new OnClickListener() {
+        //rlayout.setOnClickListener(new OnClickListener() {
+        /*book_image.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mIsSubPopUpWindowShowing) {
@@ -234,7 +248,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                     setMainMenuVisibility(true);
                 }
             }
-        });
+        });*/
 
         Intent intent = new Intent(this, TTSService.class);
         Bundle bundle = new Bundle();
@@ -250,6 +264,136 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
         bindService(intent, TTSConn, BIND_AUTO_CREATE);
 
     }
+
+    private class mGestureListener implements GestureDetector.OnGestureListener{
+
+                        // 用户轻触触摸屏，由1个MotionEvent ACTION_DOWN触发
+                       public boolean onDown(MotionEvent e) {
+                        Log.i("MyGesture", "onDown");
+                        Toast.makeText(MainActivity.this, "onDown", Toast.LENGTH_SHORT).show();
+                        return false;
+                   }
+
+                        /*
+39.         * 用户轻触触摸屏，尚未松开或拖动，由一个1个MotionEvent ACTION_DOWN触发
+40.         * 注意和onDown()的区别，强调的是没有松开或者拖动的状态
+41.         *
+42.         * 而onDown也是由一个MotionEventACTION_DOWN触发的，但是他没有任何限制，
+43.         * 也就是说当用户点击的时候，首先MotionEventACTION_DOWN，onDown就会执行，
+44.         * 如果在按下的瞬间没有松开或者是拖动的时候onShowPress就会执行，如果是按下的时间超过瞬间
+45.         * （这块我也不太清楚瞬间的时间差是多少，一般情况下都会执行onShowPress），拖动了，就不执行onShowPress。
+46.         */
+                        public void onShowPress(MotionEvent e) {
+                        Log.i("gesture", "onShowPress");
+                        Toast.makeText(MainActivity.this, "onShowPress", Toast.LENGTH_SHORT).show();
+                    }
+
+                        // 用户（轻触触摸屏后）松开，由一个1个MotionEvent ACTION_UP触发
+                        ///轻击一下屏幕，立刻抬起来，才会有这个触发
+                        //从名子也可以看出,一次单独的轻击抬起操作,当然,如果除了Down以外还有其它操作,那就不再算是Single操作了,所以这个事件 就不再响应
+                        public boolean onSingleTapUp(MotionEvent e) {
+                        Log.i("gesture", "onSingleTapUp");
+                        Toast.makeText(MainActivity.this, "onSingleTapUp", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+
+                        // 用户按下触摸屏，并拖动，由1个MotionEvent ACTION_DOWN, 多个ACTION_MOVE触发
+                        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                                                                   float distanceX, float distanceY) {
+                        Log.i("gesture", "onScroll:"+(e2.getX()-e1.getX()) +"   "+distanceX);
+                        Toast.makeText(MainActivity.this, "onScroll", Toast.LENGTH_LONG).show();
+
+                       return true;
+                    }
+
+                        // 用户长按触摸屏，由多个MotionEvent ACTION_DOWN触发
+                        public void onLongPress(MotionEvent e) {
+                         Log.i("gesture", "onLongPress");
+                         Toast.makeText(MainActivity.this, "onLongPress", Toast.LENGTH_LONG).show();
+                    }
+
+                        // 用户按下触摸屏、快速移动后松开，由1个MotionEvent ACTION_DOWN, 多个ACTION_MOVE, 1个ACTION_UP触发
+                        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                                                                  float velocityY) {
+                        Log.i("gesture", "onFling");
+                       Toast.makeText(MainActivity.this, "onFling", Toast.LENGTH_LONG).show();
+                        return true;
+                    }
+            };
+
+
+    private class mSimpleGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+                /*****OnGestureListener的函数*****/
+                public boolean onDown(MotionEvent e) {
+                       Log.i("gesture", "onDown");
+                        //Toast.makeText(MainActivity.this, "onDown", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+
+                public void onShowPress(MotionEvent e) {
+                        Log.i("gesture", "onShowPress");
+                        Toast.makeText(MainActivity.this, "onShowPress", Toast.LENGTH_SHORT).show();
+                    }
+
+                public boolean onSingleTapUp(MotionEvent e) {
+                        Log.i("gesture", "onSingleTapUp");
+                        Toast.makeText(MainActivity.this, "onSingleTapUp", Toast.LENGTH_SHORT).show();
+                    if (mIsSubPopUpWindowShowing) {
+                        hideSubMenu();
+                    }
+                    if (mIsMainPopupWindowShowing) {
+                        setMainMenuVisibility(false);
+                    } else {
+                        setMainMenuVisibility(true);
+                    }
+                        return true;
+                    }
+
+                public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                               float distanceX, float distanceY) {
+                        Log.i("gesture", "onScroll:" + (e2.getX() - e1.getX()) + "   " + distanceX);
+                        Toast.makeText(MainActivity.this, "onScroll", Toast.LENGTH_LONG).show();
+
+                        return true;
+                    }
+
+                public void onLongPress(MotionEvent e) {
+                        Log.i("gesture", "onLongPress");
+                        //Toast.makeText(MainActivity.this, "onLongPress", Toast.LENGTH_LONG).show();
+                    }
+
+                public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                        float velocityY) {
+                       Log.i("gesture", "onFling");
+                        Toast.makeText(MainActivity.this, "onFling", Toast.LENGTH_LONG).show();
+
+                        return true;
+                    }
+
+                /*****OnDoubleTapListener的函数*****/
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                        Log.i("gesture", "onSingleTapConfirmed");
+                        Toast.makeText(MainActivity.this, "onSingleTapConfirmed", Toast.LENGTH_LONG).show();
+                                return true;
+                   }
+
+                public boolean onDoubleTap(MotionEvent e) {
+                        Log.i("gesture", "onDoubleTap");
+                        Toast.makeText(MainActivity.this, "onDoubleTap", Toast.LENGTH_LONG).show();
+                        return true;
+                    }
+
+                public boolean onDoubleTapEvent(MotionEvent e) {
+                        Log.i("gesture", "onDoubleTapEvent");
+                        Toast.makeText(MainActivity.this, "onDoubleTapEvent", Toast.LENGTH_LONG).show();
+                        return true;
+                    }
+
+
+    }
+
+
 
     class PageAutoFlipinger implements PageFlipingControler{
         @Override
