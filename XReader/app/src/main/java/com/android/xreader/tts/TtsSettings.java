@@ -51,6 +51,7 @@ public class TtsSettings extends PreferenceActivity implements OnPreferenceChang
 	public void onCreate(Bundle savedInstanceState) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
+
 		addPreferencesFromResource(R.xml.tts_setting);
 
 		speed = Integer.parseInt((String) SharedPreferencesUtils.getParam(this,"speed_preference","50"));

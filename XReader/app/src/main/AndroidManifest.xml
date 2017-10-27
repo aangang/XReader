@@ -60,7 +60,8 @@
         </activity>
         <activity
             android:name=".tts.TtsSettings"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".TimerSettingActivity"
             android:screenOrientation="portrait" />

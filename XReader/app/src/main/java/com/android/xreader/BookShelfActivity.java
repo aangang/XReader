@@ -143,13 +143,16 @@ public class BookShelfActivity extends BaseActivity {
                     break;
                 case 1:
                     Toast.makeText(BookShelfActivity.this,"文档拷贝完成",Toast.LENGTH_SHORT).show();
+                    notifyDataChange();
                     break;
             }
         }
     };
 
     private void notifyDataChange() {
-        albumShelfAdapter.notifyDataSetChanged();
+        Tools.log("notifyDataChange");
+        //albumShelfAdapter.notifyDataSetChanged();
+        albumShelfAdapter.change(refresh());
     }
 
     private void initData() {
@@ -285,6 +288,7 @@ public class BookShelfActivity extends BaseActivity {
 
     private List<BookFile> refresh() {
         List<BookFile> booksdata = mgr.queryPro();
+        Tools.log("refresh");
         if (!nhFlag) {
             for (int i = 0; i < booksdata.size(); i++) {
                 if (booksdata.get(i).flag.equals("3"))

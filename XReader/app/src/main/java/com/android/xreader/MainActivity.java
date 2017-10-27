@@ -310,7 +310,7 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener, O
                     }
 
 
-                        // 用户按下触摸屏，并拖动，由1个MotionEvent ACTION_DOWN, 多个ACTION_MOVE触发
+                    // 用户按下触摸屏，并拖动，由1个MotionEvent ACTION_DOWN, 多个ACTION_MOVE触发
                     public boolean onScroll(MotionEvent e1, MotionEvent e2,
                                                                    float distanceX, float distanceY) {
                         //Log.i("gesture", "onScroll:"+(e2.getX()-e1.getX()) +"   "+distanceX);
