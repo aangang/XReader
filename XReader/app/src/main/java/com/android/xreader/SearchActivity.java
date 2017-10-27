@@ -36,12 +36,12 @@ public class SearchActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String content = editText.getText().toString();
                 if(content.replaceAll(" ","").isEmpty()){
-                    Toast.makeText(SearchActivity.this, "miss the keyword", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SearchActivity.this, "请输入搜索关键字", Toast.LENGTH_SHORT).show();
                 }else{
                     Intent intent = new Intent(SearchActivity.this, FileSearcherActivity.class);
                     intent.putExtra("keyword",content);
                     //intent.putExtra("theme",R.style.SearchTheme);
-                    intent.putExtra("min",50*1024);
+                    intent.putExtra("min",1024);
                     startActivityForResult(intent,SEARCH_CODE);
                 }
             }
@@ -69,10 +69,15 @@ public class SearchActivity extends AppCompatActivity {
         if(requestCode == SEARCH_CODE && resultCode ==FileSearcherActivity.OK && data != null){
             ArrayList<File> list = (ArrayList<File>) data.getSerializableExtra("data");
             Toast.makeText(this,"you selected"+list.size()+"items",Toast.LENGTH_SHORT).show();
-        }
 
-        if(requestCode == LOADBOOK_CODE && resultCode == LoadBookActivity.OK && data != null){
+            Intent intent = new Intent();
+            intent.putExtra("data",list);
+            setResult(BookShelfActivity.SEARCH_OK,intent);
+            finish();
+
+        }else if(requestCode == LOADBOOK_CODE && resultCode == LoadBookActivity.OK && data != null){
             Toast.makeText(this,"book loaded",Toast.LENGTH_SHORT).show();
+
         }
 
     }

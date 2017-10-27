@@ -7,6 +7,9 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,17 +23,22 @@ import android.widget.Toast;
 import com.android.xreader.adapter.AlbumShelfAdapter;
 import com.android.xreader.db.DBManager;
 import com.android.xreader.module.BookFile;
+import com.android.xreader.utils.CopyFileListener;
 import com.android.xreader.utils.FileManager;
 import com.android.xreader.utils.FusionField;
 import com.android.xreader.utils.Tools;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookShelfActivity extends BaseActivity {
     private GridView bookShelf;
 
     private AlbumShelfAdapter albumShelfAdapter;
+    private static int SEARCH_RQU = 1;
+    public static int SEARCH_OK = 11;
+    public static int SEARCH_NO = 22;
 
     private DBManager mgr;
 
@@ -80,12 +88,68 @@ public class BookShelfActivity extends BaseActivity {
             public void onClick(View view) {
                 Tools.log("search clicked");
                 Intent intent = new Intent(BookShelfActivity.this,SearchActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,SEARCH_RQU);
             }
         });
     }
 
+    BookCopyThread mBookCopyThread;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == SEARCH_RQU && resultCode == SEARCH_OK){
+            Tools.log("bookshelf search ok");
+            ArrayList<File> list = (ArrayList<File>) data.getSerializableExtra("data");
+
+            mBookCopyThread = new BookCopyThread(list);
+            mHandler.sendEmptyMessage(0);
+
+        }else if(requestCode == SEARCH_RQU && resultCode == SEARCH_NO){
+            Tools.log("bookshelf search no select");
+            Toast.makeText(this,"没有选择文件",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 复制文件线程
+     */
+    class BookCopyThread extends Thread{
+        ArrayList<File> mBooks;
+        public BookCopyThread(ArrayList<File> books){
+            mBooks = books;
+        }
+
+        public void run() {
+            Tools.log("BookCopyThread  running");
+            FileManager.getInstance().copyFilesToSDCard(mBooks,copyBooks);
+
+        }
+    }
+
+    private CopyFileListener copyBooks = new CopyFileListener() {
+        @Override
+        public void onCopyFinish() {
+            mHandler.sendEmptyMessage(1);
+        }
+    };
+
+    private Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    if(mBookCopyThread != null) {
+                        mBookCopyThread.start();
+                    }
+                    break;
+                case 1:
+                    Toast.makeText(BookShelfActivity.this,"文档拷贝完成",Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
+
     private void notifyDataChange() {
+        albumShelfAdapter.notifyDataSetChanged();
     }
 
     private void initData() {
@@ -117,6 +181,7 @@ public class BookShelfActivity extends BaseActivity {
             }
         }
         albumShelfAdapter = new AlbumShelfAdapter(books, this);
+
         bookShelf.setAdapter(albumShelfAdapter);
         bookShelf.setOnItemClickListener(new OnItemClickListener() {
             @Override
